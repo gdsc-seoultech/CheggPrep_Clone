@@ -3,19 +3,20 @@ package com.comye1.cheggprep
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.Computer
-import androidx.compose.material.icons.filled.NoteAdd
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,9 +30,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CheggPrepTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
-                    Greeting("Android")
-                }
+                HomeScreen()
             }
         }
     }
@@ -46,19 +45,122 @@ fun Greeting(name: String) {
 @Composable
 fun DefaultPreview() {
     Column(modifier = Modifier.padding(8.dp)) {
-        DeckInSubject()
-        Spacer(modifier = Modifier.height(8.dp))
-        StudyGuide()
-        Spacer(modifier = Modifier.height(8.dp))
-        DeckItem()
-        Spacer(modifier = Modifier.height(8.dp))
-        MyDeckItem()
-        Spacer(modifier = Modifier.height(8.dp))
-        MakeMyDeck()
-        Spacer(modifier = Modifier.height(8.dp))
-        SubjectItem()
-        Spacer(modifier = Modifier.height(8.dp))
-        CardItem()
+        FindFlashCards()
+    }
+}
+
+@Composable
+fun FilterText(text: String, selected: Boolean, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .clip(CircleShape)
+            .clickable(enabled = !selected, onClick = onClick)
+            .background(color = if (selected) Color.LightGray else Color.Transparent)
+            .padding(horizontal = 20.dp, vertical = 2.dp)
+    ) {
+        Text(text = text, style = MaterialTheme.typography.body1, fontWeight = FontWeight.ExtraBold)
+    }
+}
+
+@Preview
+@Composable
+fun HomeScreen() {
+    var (selectedFilterIndex, setFilterIndex) = remember {
+        mutableStateOf(0)
+    }
+
+    Scaffold(
+        topBar = {
+            Column(
+                modifier = Modifier.padding(
+                    top = 8.dp,
+                    bottom = 4.dp,
+                    start = 16.dp,
+                    end = 16.dp
+                )
+            ) {
+                Text(
+                    text = "CheggPrep",
+                    style = MaterialTheme.typography.h5,
+                    color = DeepOrange,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                FilterSection(selectedFilterIndex, setFilterIndex)
+            }
+        }
+    ) {
+        LazyColumn(modifier = Modifier.padding(16.dp)) {
+            repeat(20) {
+                item {
+                    DeckItem()
+                }
+                item {
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FilterSection(selectedFilterIndex: Int, setIndex: (Int) -> Unit) {
+    Row {
+        FilterText("All", selectedFilterIndex == 0) { setIndex(0) }
+        Spacer(modifier = Modifier.width(8.dp))
+        FilterText("Bookmarks", selectedFilterIndex == 1) { setIndex(1) }
+        Spacer(modifier = Modifier.width(8.dp))
+        FilterText("Created", selectedFilterIndex == 2) { setIndex(2) }
+    }
+}
+
+@Composable
+fun DeckTitleTextField() {
+
+    var text by remember {
+        mutableStateOf("")
+    }
+
+    TextField(
+        value = text, onValueChange = { text = it },
+        modifier = Modifier.fillMaxWidth(),
+        textStyle = MaterialTheme.typography.h4,
+        placeholder = {
+            Text(
+                text = "Untitled deck",
+                style = MaterialTheme.typography.h4,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color.LightGray
+            )
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            cursorColor = DeepOrange,
+            backgroundColor = Color.Transparent,
+            focusedIndicatorColor = Color.LightGray,
+            unfocusedIndicatorColor = Color.LightGray
+        ),
+        maxLines = 2
+    )
+
+}
+
+@Composable
+fun FindFlashCards() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape = CircleShape)
+            .border(width = 1.dp, color = Color.LightGray, shape = CircleShape)
+            .padding(horizontal = 8.dp, vertical = 16.dp)
+            .clickable { },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Search,
+            contentDescription = "search flashcards",
+            tint = Color.Gray
+        )
+        Text(text = " Find flashcards", style = MaterialTheme.typography.body1, color = Color.Gray)
     }
 }
 
@@ -277,9 +379,11 @@ fun CardItem() {
             modifier = Modifier.padding(16.dp),
             fontWeight = FontWeight.ExtraBold
         )
-        Divider(modifier = Modifier
-            .fillMaxWidth()
-            .height(2.dp), color = Color.LightGray)
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(2.dp), color = Color.LightGray
+        )
         Text(
             text = "A request to execute an OS service-layer function",
             modifier = Modifier.padding(16.dp),
