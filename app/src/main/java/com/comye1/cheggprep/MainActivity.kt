@@ -21,6 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.comye1.cheggprep.models.DECK_ADDED
+import com.comye1.cheggprep.models.DECK_CREATED
+import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.ui.theme.CheggPrepTheme
 import com.comye1.cheggprep.ui.theme.DeepOrange
 
@@ -91,13 +94,25 @@ fun HomeScreen() {
         }
     ) {
         LazyColumn(modifier = Modifier.padding(16.dp)) {
-            repeat(20) {
-                item {
-                    DeckItem()
-                }
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
+            when (selectedFilterIndex) {
+                0 ->
+                    SampleDataSet.deckSample.forEach {
+                        item {
+                            DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
+                        }
+                    }
+                1 ->
+                    SampleDataSet.deckSample.filter { it.bookmarked }.forEach {
+                        item {
+                            DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
+                        }
+                    }
+                2 ->
+                    SampleDataSet.deckSample.filter { it.deckType == DECK_CREATED }.forEach {
+                        item {
+                            DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
+                        }
+                    }
             }
         }
     }
@@ -221,9 +236,9 @@ fun StudyGuide() {
 }
 
 @Composable
-fun DeckItem() {
+fun DeckItem(deck: Deck, modifier: Modifier = Modifier) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .border(
                 width = 2.dp,
@@ -235,7 +250,7 @@ fun DeckItem() {
             .padding(16.dp)
     ) {
         Text(
-            text = "recursion",
+            text = deck.deckTitle,
             style = MaterialTheme.typography.h5,
             fontWeight = FontWeight.Bold
         )
@@ -245,16 +260,38 @@ fun DeckItem() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "8 Cards",
+                text = deck.cardList.size.toString() + if (deck.cardList.size > 1) " Cards" else "Card",
                 style = MaterialTheme.typography.subtitle1,
                 fontWeight = FontWeight.Bold,
                 color = Color.Gray
             )
-            Icon(
-                imageVector = Icons.Default.Bookmark,
-                contentDescription = "bookmark",
-                tint = Color.Gray
-            )
+            // 아이콘 부분
+            when(deck.deckType) {
+                DECK_CREATED -> {
+                    if(deck.shared) {
+                        Icon(
+                            imageVector = Icons.Default.Visibility,
+                            contentDescription = "shared",
+                            tint = Color.Gray
+                        )
+                    }else {
+                        Icon(
+                            imageVector = Icons.Default.VisibilityOff,
+                            contentDescription = "not shared",
+                            tint = Color.Gray
+                        )
+                    }
+                }
+                DECK_ADDED -> {
+                    if(deck.bookmarked){
+                        Icon(
+                            imageVector = Icons.Default.Bookmark,
+                            contentDescription = "bookmark",
+                            tint = Color.Gray
+                        )
+                    }
+                }
+            }
         }
     }
 }
