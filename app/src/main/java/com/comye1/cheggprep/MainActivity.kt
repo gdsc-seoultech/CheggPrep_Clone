@@ -24,9 +24,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             CheggPrepTheme {
                 // A surface container using the 'background' color from the theme
-                HomeScreen()
+//                HomeScreen()
 //                SearchScreen()
-//                CreateScreen()
+                CreateScreen()
 //                MoreScreen()
             }
         }

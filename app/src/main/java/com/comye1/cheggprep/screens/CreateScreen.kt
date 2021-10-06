@@ -50,7 +50,7 @@ fun CreateScreen() {
                 }
             },
             actions = {
-                TextButton(onClick = { /*TODO*/ }) {
+                TextButton(onClick = { /*TODO*/ }, enabled = deckTitle.isNotBlank()) {
                     Text(
                         "Next",
                         style = MaterialTheme.typography.h6,
