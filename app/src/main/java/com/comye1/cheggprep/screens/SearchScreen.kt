@@ -16,14 +16,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.comye1.cheggprep.models.DECK_ADDED
 import com.comye1.cheggprep.models.DECK_CREATED
 import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.ui.theme.DeepOrange
 
-@Preview
 @Composable
-fun SearchScreen() {
+fun SearchScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -123,65 +123,3 @@ fun SubjectItem() {
         )
     }
 }
-
-@Composable
-fun DeckItem(deck: Deck, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .border(
-                width = 2.dp,
-                color = Color.LightGray
-            )
-            .clickable {
-
-            }
-            .padding(16.dp)
-    ) {
-        Text(
-            text = deck.deckTitle,
-            style = MaterialTheme.typography.h5,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = deck.cardList.size.toString() + if (deck.cardList.size > 1) " Cards" else "Card",
-                style = MaterialTheme.typography.subtitle1,
-                fontWeight = FontWeight.Bold,
-                color = Color.Gray
-            )
-            // 아이콘 부분
-            when (deck.deckType) {
-                DECK_CREATED -> {
-                    if (deck.shared) {
-                        Icon(
-                            imageVector = Icons.Default.Visibility,
-                            contentDescription = "shared",
-                            tint = Color.Gray
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Default.VisibilityOff,
-                            contentDescription = "not shared",
-                            tint = Color.Gray
-                        )
-                    }
-                }
-                DECK_ADDED -> {
-                    if (deck.bookmarked) {
-                        Icon(
-                            imageVector = Icons.Default.Bookmark,
-                            contentDescription = "bookmark",
-                            tint = Color.Gray
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-

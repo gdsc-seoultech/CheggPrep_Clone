@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.LightOrange
 
@@ -23,9 +24,8 @@ fun Modifier.moreModifier(onClick: () -> Unit) = this
     .clickable(onClick = onClick)
     .padding(horizontal = 8.dp, vertical = 12.dp)
 
-@Preview
 @Composable
-fun MoreScreen() {
+fun MoreScreen(navController: NavHostController) {
 
     val (notified, setNotified) = remember {
         mutableStateOf(true)

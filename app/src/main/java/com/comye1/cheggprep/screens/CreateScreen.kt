@@ -10,12 +10,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.LightOrange
 
-@Preview
 @Composable
-fun CreateScreen() {
+fun CreateScreen(navController: NavHostController) {
 
     val (deckTitle, setDeckTitle) = remember {
         mutableStateOf("")
