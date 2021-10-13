@@ -75,7 +75,7 @@ fun DeckScreen(navController: NavController, title: String, cardsNum: Int) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = cardsNum.toString() + if (cardsNum > 1) "Cards" else "Card",
+                text = cardsNum.toString() + if (cardsNum > 1) " Cards" else " Card",
                 color = Color.Gray
             )
             Spacer(modifier = Modifier.height(16.dp))
