@@ -52,7 +52,7 @@ fun BottomNavigationBar(navController: NavController) {
 
     BottomNavigation(
         backgroundColor = Color.White,
-        elevation = 4.dp,
+        elevation = 1.dp,
         modifier = Modifier.padding(4.dp)
     ) {
         BottomNav.items.forEach { item ->

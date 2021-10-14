@@ -24,7 +24,7 @@ import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.screens.*
 import com.comye1.cheggprep.ui.theme.CheggPrepTheme
 
-// TODO : 3Cards ( 띄어쓰기 ) BottomNavigationBar scale
+// TODO : BottomNavigationBar scale / popUpTo 옵션 지정
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

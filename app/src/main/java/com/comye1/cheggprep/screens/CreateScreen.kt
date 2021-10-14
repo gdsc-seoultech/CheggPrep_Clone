@@ -42,7 +42,7 @@ fun CreateScreen(navController: NavHostController) {
                 }
             },
             navigationIcon = {
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
                         imageVector = Icons.Outlined.Close,
                         contentDescription = "close create screen"
