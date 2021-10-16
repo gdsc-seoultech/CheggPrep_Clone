@@ -1,6 +1,6 @@
 # CheggPrep_Clone
 Android팀 프로젝트 - Jetpack Compose로 플래시카드 클론하기!!  
-2021년 9월 18일 ~ 진행중
+2021년 9월 7일 ~ 진행중
 진행 : 김예원, 강인영
 <br>
 <br>
@@ -30,3 +30,11 @@ Animation을 위한 animateDpAsState와 AnimationSpec의 tween/spring/keyframes 
 ![](https://images.velog.io/images/kiyoog02/post/8097a0c0-7390-4d43-8e13-6921ab1bb917/image.png)
 ![](https://images.velog.io/images/kiyoog02/post/569c15d3-e0ab-4a17-a794-49ed5715d302/image.png)
 <br><br>
+
+## Week5 - Navigation 동작 & UI 이해
+지난 시간에 배운 Animation을 활용한 ProgressBar 구현  
+Navigation의 NavHost, NavController, route 등에 대해 배우고 Screen 구현에 직접 활용  
+Material Design이 제공하는 BottomNavigation을 사용하여 하단바 생성  
+![image](https://user-images.githubusercontent.com/52899340/137591864-a2face5f-37a0-4005-92df-ec21e9edeb2c.png)
+![image](https://user-images.githubusercontent.com/52899340/137591934-77b81936-b194-42e1-b83e-b631c4c4211c.png)
+
