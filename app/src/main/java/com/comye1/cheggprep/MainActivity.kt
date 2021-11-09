@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -24,6 +25,7 @@ import com.comye1.cheggprep.navigation.BottomNavigationBar
 import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.screens.*
 import com.comye1.cheggprep.ui.theme.CheggPrepTheme
+import com.comye1.cheggprep.viewmodel.CheggViewModel
 
 // TODO : BottomNavigationBar scale / popUpTo 옵션 지정
 
@@ -39,6 +41,8 @@ class MainActivity : ComponentActivity() {
                     mutableStateOf(true)
                 }
 
+                val cheggViewModel: CheggViewModel = viewModel()
+
                 Scaffold(
                     bottomBar = {
                         if(bottomBarShown){
@@ -49,19 +53,19 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = Screen.Home.route) {
                         composable(Screen.Home.route) {
                             showBottomBar(true)
-                            HomeScreen(navController)
+                            HomeScreen(navController, cheggViewModel)
                         }
                         composable(Screen.Search.route) {
                             showBottomBar(true)
-                            SearchScreen(navController)
+                            SearchScreen(navController, cheggViewModel)
                         }
                         composable(Screen.Create.route) {
                             showBottomBar(false)
-                            CreateScreen(navController)
+                            CreateScreen(navController, cheggViewModel)
                         }
                         composable(Screen.More.route) {
                             showBottomBar(true)
-                            MoreScreen(navController)
+                            MoreScreen(navController, cheggViewModel)
                         }
                         composable(Screen.Deck.route +"/{deckTitle}/{cardsNum}") { backStackEntry ->
                             val deckTitle = backStackEntry.arguments?.getString("deckTitle") ?: "invalid card"
