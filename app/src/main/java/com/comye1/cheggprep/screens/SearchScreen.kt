@@ -28,7 +28,6 @@ import androidx.navigation.NavHostController
 import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.viewmodel.CheggViewModel
-import com.comye1.cheggprep.viewmodel.SearchState
 
 @Composable
 fun SearchScreen(navController: NavHostController, viewModel: CheggViewModel) {
