@@ -30,9 +30,10 @@ import com.comye1.cheggprep.models.DECK_CREATED
 import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.ui.theme.DeepOrange
+import com.comye1.cheggprep.viewmodel.CheggViewModel
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController, viewModel: CheggViewModel) {
     var (selectedFilterIndex, setFilterIndex) = remember {
         mutableStateOf(0)
     }
@@ -61,7 +62,7 @@ fun HomeScreen(navController: NavHostController) {
         LazyColumn(modifier = Modifier.padding(16.dp)) {
             when (selectedFilterIndex) {
                 0 ->
-                    SampleDataSet.deckSample.forEach {
+                    viewModel.myDeckList.forEach {
                         item {
                             DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
                             {
@@ -72,7 +73,7 @@ fun HomeScreen(navController: NavHostController) {
                         }
                     }
                 1 ->
-                    SampleDataSet.deckSample.filter { it.bookmarked }.forEach {
+                    viewModel.myDeckList.filter { it.bookmarked }.forEach {
                         item {
                             DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
                             {
@@ -83,7 +84,7 @@ fun HomeScreen(navController: NavHostController) {
                         }
                     }
                 2 ->
-                    SampleDataSet.deckSample.filter { it.deckType == DECK_CREATED }.forEach {
+                    viewModel.myDeckList.filter { it.deckType == DECK_CREATED }.forEach {
                         item {
                             DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
                             {

@@ -13,11 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.LightOrange
+import com.comye1.cheggprep.viewmodel.CheggViewModel
 
 fun Modifier.moreModifier(onClick: () -> Unit) = this
     .fillMaxWidth()
@@ -25,7 +25,7 @@ fun Modifier.moreModifier(onClick: () -> Unit) = this
     .padding(horizontal = 8.dp, vertical = 12.dp)
 
 @Composable
-fun MoreScreen(navController: NavHostController) {
+fun MoreScreen(navController: NavHostController, cheggViewModel: CheggViewModel) {
 
     val (notified, setNotified) = remember {
         mutableStateOf(true)
