@@ -21,6 +21,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.LightOrange
+import com.comye1.cheggprep.viewmodel.CheggViewModel
 
 
 enum class CreateState {
@@ -30,7 +31,7 @@ enum class CreateState {
 
 @ExperimentalComposeUiApi
 @Composable
-fun CreateScreen(navController: NavHostController) {
+fun CreateScreen(navController: NavHostController, cheggViewModel: CheggViewModel) {
 
     val (deckTitle, setDeckTitle) = remember {
         mutableStateOf("")

@@ -3,15 +3,14 @@ package com.comye1.cheggprep.screens
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Computer
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -24,49 +23,47 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.comye1.cheggprep.models.DECK_ADDED
+import com.comye1.cheggprep.models.DECK_CREATED
+import com.comye1.cheggprep.models.Deck
+import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.ui.theme.DeepOrange
+import com.comye1.cheggprep.viewmodel.CheggViewModel
+import com.comye1.cheggprep.viewmodel.SearchState
 
-enum class SearchState {
-    ButtonScreen,
-    QueryScreen,
-    ResultScreen
-}
 
 @Composable
-fun SearchScreen(navController: NavHostController) {
+fun SearchScreen(navController: NavHostController, viewModel: CheggViewModel) {
 
-    val (screenState, setScreenState) = remember {
-        mutableStateOf(SearchState.ButtonScreen)
-    }
-
-    val (queryString, setQueryString) = remember {
-        mutableStateOf("")
-    }
-
-    when (screenState) {
+    when (viewModel.searchScreenState.value) {
         SearchState.ButtonScreen -> {
             SearchButtonScreen {
-                if(queryString.isNotBlank()){
-                    setScreenState(SearchState.ResultScreen)
+                if(viewModel.queryString.value.isNotBlank()){
+                    viewModel.toResultScreen()
                 }else {
-                    setScreenState(SearchState.QueryScreen)
+                    viewModel.toQueryScreen()
                 }
             }
         }
         SearchState.QueryScreen -> {
             SearchQueryScreen(
-                queryString = queryString,
-                setQueryString = setQueryString,
-                toButtonScreen = { setScreenState(SearchState.ButtonScreen) },
-                toResultScreen = { setScreenState(SearchState.ResultScreen) }
+                queryString = viewModel.queryString.value,
+                setQueryString = viewModel::setQueryString,
+                toButtonScreen = viewModel::toButtonScreen,
+                toResultScreen = viewModel::toResultScreen
             )
         }
         SearchState.ResultScreen -> {
             SearchResultScreen(
-                queryString = queryString,
-                setQueryString = setQueryString,
-                toButtonScreen = { setScreenState(SearchState.ButtonScreen) },
-                onSearchKey = { /*검색 결과 업데이트*/ }
+                queryString = viewModel.queryString.value,
+                setQueryString = viewModel::setQueryString,
+                getQueryResult = viewModel::getQueryResult,
+                toButtonScreen = viewModel::toButtonScreen,
+                toDeckScreen = {
+                    navController.navigate(
+                        Screen.Deck.route + "/${it.deckTitle}/${it.cardList.size}"
+                    )
+                }
             )
         }
     }
@@ -76,32 +73,80 @@ fun SearchScreen(navController: NavHostController) {
 fun SearchResultScreen(
     queryString: String,
     setQueryString: (String) -> Unit,
+    getQueryResult: () -> List<Deck>,
     toButtonScreen: () -> Unit,
-    onSearchKey: () -> Unit
+    toDeckScreen: (Deck) -> Unit
 ) {
+
+    val (queryResult, setQueryResult) = remember {
+        mutableStateOf(getQueryResult())
+    }
+
     Scaffold(
         topBar = {
             SearchTopBar(
                 queryString = queryString,
                 setQueryString = setQueryString,
                 onBackButtonClick = toButtonScreen,
-                onSearchKey = onSearchKey/*Todo 검색 결과 업데이트*/
+                onSearchKey = {
+                    setQueryResult(getQueryResult())
+                }/*Todo 검색 결과 업데이트*/
             )
         }
     ) {
+        LazyColumn(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp)){
+            queryResult.forEach{
+                item {
+                    DeckInResult(
+                        deck = it,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        onClick = toDeckScreen
+                    )
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(50.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun DeckInResult(
+    deck: Deck,
+    modifier: Modifier = Modifier,
+    onClick: (Deck) -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(
+                width = 2.dp,
+                color = Color.LightGray
+            )
+            .clickable(onClick = {
+                onClick(deck)
+            })
+            .padding(16.dp)
+    ) {
+        Text(
+            text = deck.deckTitle,
+            style = MaterialTheme.typography.h5,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(4.dp))
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(.25f),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.Center
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "$queryString 검색 결과",
-                style = MaterialTheme.typography.body1,
-                fontSize = 20.sp,
-                color = Color.LightGray,
-                fontWeight = FontWeight.Bold
+                text = deck.cardList.size.toString() + if (deck.cardList.size > 1) " Cards" else "Card",
+                style = MaterialTheme.typography.subtitle1,
+                fontWeight = FontWeight.Bold,
+                color = Color.Gray
             )
         }
     }
