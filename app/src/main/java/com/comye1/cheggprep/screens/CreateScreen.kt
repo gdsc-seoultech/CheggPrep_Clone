@@ -1,5 +1,6 @@
 package com.comye1.cheggprep.screens
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -8,9 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -19,19 +18,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
+import com.comye1.cheggprep.models.Card
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.LightOrange
 import com.comye1.cheggprep.viewmodel.CheggViewModel
+import com.comye1.cheggprep.viewmodel.CreateState
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 
-
-enum class CreateState {
-    TitleScreen,
-    CardScreen
-}
-
+@ExperimentalPagerApi
 @ExperimentalComposeUiApi
 @Composable
-fun CreateScreen(navController: NavHostController, cheggViewModel: CheggViewModel) {
+fun CreateScreen(navController: NavHostController, viewModel: CheggViewModel) {
 
     val (deckTitle, setDeckTitle) = remember {
         mutableStateOf("")
@@ -41,11 +40,13 @@ fun CreateScreen(navController: NavHostController, cheggViewModel: CheggViewMode
         mutableStateOf(true)
     }
 
-    val (screenState, setScreenState) = remember {
-        mutableStateOf(CreateState.TitleScreen)
+    // 생성할 카드 리스트
+    val cardList = remember {
+        mutableStateListOf(Card("", ""))
     }
 
-    when (screenState) {
+    // 뷰모델로 이동
+    when (viewModel.createScreenState.value) {
         CreateState.TitleScreen -> {
             CreateTitleScreen(
                 deckTitle = deckTitle,
@@ -53,24 +54,55 @@ fun CreateScreen(navController: NavHostController, cheggViewModel: CheggViewMode
                 visibility = visibility,
                 setVisibility = setVisibility,
                 navigateBack = { navController.popBackStack() },
-                toCardScreen = { setScreenState(CreateState.CardScreen) }
+                toCardScreen = viewModel::toCardScreen
             )
         }
         CreateState.CardScreen -> {
             CreateCardScreen(
+                cardList = cardList, //SnapshotStateList<Card>가 전달된다
+                setCard = { index, card ->
+                    cardList[index] = card // Card field 변경
+                },
+                addCard = { cardList.add(Card("", "")) }, // 새 Card 추가
+                removeCard = { index ->
+                    cardList.removeAt(index) // Card 삭제
+                    if (cardList.size == 0) cardList.add(Card("", ""))
+                    // 삭제된 뒤에 cardList 사이즈가 0인 경우 새 Card 추가
+                },
                 navigateBack = { navController.popBackStack() },
-                onDone = {}
+                onDone = { Log.d("cardList", cardList.joinToString("\n")) }
             )
         }
     }
 }
 
+@ExperimentalPagerApi
 @ExperimentalComposeUiApi
 @Composable
 fun CreateCardScreen(
+    cardList: List<Card>, //보여줄 & 수정할 카드 리스트
+    setCard: (index: Int, card: Card) -> Unit, //카드 내용을 입력했을 때
+    addCard: () -> Unit, //새로운 카드를 추가 (FAB 클릭 시)
+    removeCard: (index: Int) -> Unit, //카드를 삭제
     navigateBack: () -> Unit,
     onDone: () -> Unit
 ) {
+    val pagerState = rememberPagerState() // Pager의 상태 (페이지 수, 현재 페이지 등)
+
+    var prevPageCount by remember { // 이전 페이지 수를 기억
+        mutableStateOf(pagerState.pageCount)
+    }
+
+    // 스크롤 애니메이션 처리
+    LaunchedEffect(key1 = pagerState.pageCount) { // 페이지 수가 변했을 때
+        if (prevPageCount < pagerState.pageCount) {
+            // 추가된 경우 - 마지막 페이지로 스크롤
+            pagerState.animateScrollToPage(pagerState.pageCount - 1, pagerState.currentPageOffset)
+        }
+        Log.d("pagecount", (pagerState.pageCount - 1).toString())
+        prevPageCount = pagerState.pageCount // prevPageCount를 업데이트
+    }
+
     Scaffold(
         topBar = {
         TopAppBar(
@@ -82,7 +114,7 @@ fun CreateCardScreen(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        "1/10",
+                        text = "${pagerState.currentPage + 1}/${pagerState.pageCount}", //
                         style = MaterialTheme.typography.h5,
                         fontWeight = FontWeight.Bold
                     )
@@ -109,7 +141,7 @@ fun CreateCardScreen(
     },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /*TODO*/ },
+                onClick = addCard, // 카드 추가
                 backgroundColor = Color.White,
                 modifier = Modifier
                     .size(48.dp)
@@ -127,11 +159,24 @@ fun CreateCardScreen(
             }
         }
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CardItemField()
+        Column {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                HorizontalPager( // Pager
+                    count = cardList.size,
+                    state = pagerState, // 선언한 pagerState 사용 (선언하지 않으면 내부에서 자동으로 사용)
+                    contentPadding = PaddingValues(start = 32.dp, end = 32.dp)
+                    // 양쪽에 이전, 다음 카드를 보여줌
+                ) { page ->
+                    CardItemField(
+                        card = cardList[page], // page에 해당하는 card 전달
+                        setCard = { card ->
+                            setCard(page, card)
+                            // CardItemField가 전달하는 card로 해당 page에 set
+                        },
+                        removeCard = { removeCard(page) } // page에 해당하는 card 삭제
+                    )
+                }
+            }
         }
     }
 }
@@ -236,30 +281,26 @@ fun DeckTitleTextField(text: String, setText: (String) -> Unit) {
     )
 }
 
-@ExperimentalComposeUiApi
 @Composable
-fun CardItemField() {
-
-    //나중에 밖으로 뺄 것
-    val (frontText, setFrontText) = remember {
-        mutableStateOf("")
-    }
-
-    val (backText, setBackText) = remember {
-        mutableStateOf("")
-    }
-
+fun CardItemField(
+    card: Card,
+    setCard: (Card) -> Unit,
+    removeCard: () -> Unit
+) {
     Box(
         modifier = Modifier
-            .fillMaxWidth(.8f)
+            .fillMaxWidth()
             .padding(8.dp)
             .border(2.dp, Color.LightGray),
     ) {
         ConstraintLayout {
             val (front, back, delete, divider) = createRefs()
             TextField(
-                value = frontText,
-                onValueChange = setFrontText,
+                value = card.front, //frontText,
+                onValueChange = {
+                    setCard(Card(it, card.back))// cardList 안의 아이템을 변경
+
+                },
                 modifier = Modifier
                     .constrainAs(front) {
                         top.linkTo(parent.top)
@@ -288,13 +329,14 @@ fun CardItemField() {
                     .constrainAs(divider) {
                         top.linkTo(front.bottom)
                     }
-                    .fillMaxWidth()
                     .height(2.dp),
                 color = Color.LightGray
             )
             TextField(
-                value = backText,
-                onValueChange = setBackText,
+                value = card.back, //backText,
+                onValueChange = {
+                    setCard(Card(card.front, it)) // cardList 안의 아이템 변경
+                },
                 modifier = Modifier
                     .constrainAs(back) {
                         top.linkTo(divider.bottom)
@@ -319,7 +361,7 @@ fun CardItemField() {
                 )
             )
             IconButton(
-                onClick = { /*TODO*/ },
+                onClick = removeCard, // card 삭제
                 modifier = Modifier.constrainAs(delete) {
                     bottom.linkTo(parent.bottom, 10.dp)
                     start.linkTo(parent.start, 8.dp)

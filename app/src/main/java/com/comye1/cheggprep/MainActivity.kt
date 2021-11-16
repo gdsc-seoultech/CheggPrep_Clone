@@ -26,10 +26,12 @@ import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.screens.*
 import com.comye1.cheggprep.ui.theme.CheggPrepTheme
 import com.comye1.cheggprep.viewmodel.CheggViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
 
 // TODO : BottomNavigationBar scale / popUpTo 옵션 지정
 
 class MainActivity : ComponentActivity() {
+    @ExperimentalPagerApi
     @ExperimentalComposeUiApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
