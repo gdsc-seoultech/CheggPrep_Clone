@@ -31,53 +31,56 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 // TODO : BottomNavigationBar scale / popUpTo 옵션 지정
 
 class MainActivity : ComponentActivity() {
+    @ExperimentalMaterialApi
     @ExperimentalPagerApi
     @ExperimentalComposeUiApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            CheggPrepTheme {
-                val navController = rememberNavController()
 
-                val cheggViewModel: CheggViewModel = viewModel()
 
-                val (bottomBarShown, showBottomBar) = remember {
-                    mutableStateOf(true)
-                }
-
-                Scaffold(
-                    bottomBar = {
-                        if(bottomBarShown){
-                            BottomNavigationBar(navController = navController)
-                        }
-                    }
-                ) {
-                    NavHost(navController = navController, startDestination = Screen.Home.route) {
-                        composable(Screen.Home.route) {
-                            showBottomBar(true)
-                            HomeScreen(navController, cheggViewModel)
-                        }
-                        composable(Screen.Search.route) {
-                            showBottomBar(true)
-                            SearchScreen(navController, cheggViewModel)
-                        }
-                        composable(Screen.Create.route) {
-                            showBottomBar(false)
-                            CreateScreen(navController, cheggViewModel)
-                        }
-                        composable(Screen.More.route) {
-                            showBottomBar(true)
-                            MoreScreen(navController, cheggViewModel)
-                        }
-                        composable(Screen.Deck.route +"/{deckTitle}/{cardsNum}") { backStackEntry ->
-                            val deckTitle = backStackEntry.arguments?.getString("deckTitle") ?: "invalid card"
-                            val cardsNum = backStackEntry.arguments?.getString("cardsNum")?.toInt() ?: 0
-                            showBottomBar(false)
-                            DeckScreen(navController = navController, title = deckTitle, cardsNum = cardsNum)
-                        }
-                    }
-                }
-            }
+            PracticeScreen()
+//            CheggPrepTheme {
+//                val navController = rememberNavController()
+//
+//                val cheggViewModel: CheggViewModel = viewModel()
+//
+//                val (bottomBarShown, showBottomBar) = remember {
+//                    mutableStateOf(true)
+//                }
+//                Scaffold(
+//                    bottomBar = {
+//                        if(bottomBarShown){
+//                            BottomNavigationBar(navController = navController)
+//                        }
+//                    }
+//                ) {
+//                    NavHost(navController = navController, startDestination = Screen.Home.route) {
+//                        composable(Screen.Home.route) {
+//                            showBottomBar(true)
+//                            HomeScreen(navController, cheggViewModel)
+//                        }
+//                        composable(Screen.Search.route) {
+//                            showBottomBar(true)
+//                            SearchScreen(navController, cheggViewModel)
+//                        }
+//                        composable(Screen.Create.route) {
+//                            showBottomBar(false)
+//                            CreateScreen(navController, cheggViewModel)
+//                        }
+//                        composable(Screen.More.route) {
+//                            showBottomBar(true)
+//                            MoreScreen(navController, cheggViewModel)
+//                        }
+//                        composable(Screen.Deck.route +"/{deckTitle}/{cardsNum}") { backStackEntry ->
+//                            val deckTitle = backStackEntry.arguments?.getString("deckTitle") ?: "invalid card"
+//                            val cardsNum = backStackEntry.arguments?.getString("cardsNum")?.toInt() ?: 0
+//                            showBottomBar(false)
+//                            DeckScreen(navController = navController, title = deckTitle, cardsNum = cardsNum)
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 }

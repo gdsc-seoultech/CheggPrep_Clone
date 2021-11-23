@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "915461683726",
+    "project_id": "cheggprep-21027",
+    "storage_bucket": "cheggprep-21027.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915461683726:android:7e5d6c0a136135cf4a1a5f",
+        "android_client_info": {
+          "package_name": "com.comye1.cheggprep"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "915461683726-3i8hmo8tnhvf0fkf7257mda195npkbj6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9NAAJfrcUdofzKcBa_FbbeBiN9LcO3jg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "915461683726-3i8hmo8tnhvf0fkf7257mda195npkbj6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

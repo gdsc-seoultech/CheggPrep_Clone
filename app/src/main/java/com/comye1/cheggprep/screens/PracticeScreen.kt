@@ -41,7 +41,7 @@ fun PracticeScreen() {
         mutableStateOf(0f)
     }
 
-    LaunchedEffect(key1 = true) { // 시작 효과 : 0 -> 1
+    SideEffect {
         setCount(1f)
     }
 
@@ -218,7 +218,7 @@ fun FlipCard(
     )
     Box(modifier = Modifier.padding(8.dp)) {
         Card(
-            onClick = {  cardFace = cardFace.next  }, //클릭 시 카드 뒤집기
+            onClick = { cardFace = cardFace.next }, //클릭 시 카드 뒤집기
             modifier = modifier
                 .graphicsLayer {
                     // 변화하는 rotation 값을 rotationX 또는 rotationY로 사용
