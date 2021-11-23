@@ -1,6 +1,7 @@
 package com.comye1.cheggprep
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
@@ -9,9 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,61 +26,102 @@ import com.comye1.cheggprep.screens.*
 import com.comye1.cheggprep.ui.theme.CheggPrepTheme
 import com.comye1.cheggprep.viewmodel.CheggViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 // TODO : BottomNavigationBar scale / popUpTo 옵션 지정
 
+@ExperimentalMaterialApi
+@ExperimentalPagerApi
+@ExperimentalComposeUiApi
 class MainActivity : ComponentActivity() {
-    @ExperimentalMaterialApi
-    @ExperimentalPagerApi
-    @ExperimentalComposeUiApi
+
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        auth = Firebase.auth
+
         setContent {
 
+            CheggPrepTheme {
+                val navController = rememberNavController()
 
-            PracticeScreen()
-//            CheggPrepTheme {
-//                val navController = rememberNavController()
-//
-//                val cheggViewModel: CheggViewModel = viewModel()
-//
-//                val (bottomBarShown, showBottomBar) = remember {
-//                    mutableStateOf(true)
-//                }
-//                Scaffold(
-//                    bottomBar = {
-//                        if(bottomBarShown){
-//                            BottomNavigationBar(navController = navController)
-//                        }
-//                    }
-//                ) {
-//                    NavHost(navController = navController, startDestination = Screen.Home.route) {
-//                        composable(Screen.Home.route) {
-//                            showBottomBar(true)
-//                            HomeScreen(navController, cheggViewModel)
-//                        }
-//                        composable(Screen.Search.route) {
-//                            showBottomBar(true)
-//                            SearchScreen(navController, cheggViewModel)
-//                        }
-//                        composable(Screen.Create.route) {
-//                            showBottomBar(false)
-//                            CreateScreen(navController, cheggViewModel)
-//                        }
-//                        composable(Screen.More.route) {
-//                            showBottomBar(true)
-//                            MoreScreen(navController, cheggViewModel)
-//                        }
-//                        composable(Screen.Deck.route +"/{deckTitle}/{cardsNum}") { backStackEntry ->
-//                            val deckTitle = backStackEntry.arguments?.getString("deckTitle") ?: "invalid card"
-//                            val cardsNum = backStackEntry.arguments?.getString("cardsNum")?.toInt() ?: 0
-//                            showBottomBar(false)
-//                            DeckScreen(navController = navController, title = deckTitle, cardsNum = cardsNum)
-//                        }
-//                    }
-//                }
-//            }
+                val cheggViewModel: CheggViewModel = viewModel()
+
+                auth.currentUser?.let {  // currentUser가 null이 아니면 뷰모델 안의 user로 설정
+                    LaunchedEffect(key1 = true) {
+                        cheggViewModel.signIn(it.email!!, it.displayName!!)
+                    }
+                }
+
+                val firebaseAuth = cheggViewModel.firebaseAuth.collectAsState()
+
+                if (firebaseAuth.value) { // firebaseAuth가 true일 때
+                    firebaseAuthWithGoogle(cheggViewModel.token.value, cheggViewModel::signIn)
+                    cheggViewModel.completeAuth() // 로그인 후 false로 변경
+                }
+
+                val (bottomBarShown, showBottomBar) = remember {
+                    mutableStateOf(true)
+                }
+                Scaffold(
+                    bottomBar = {
+                        if(bottomBarShown){
+                            BottomNavigationBar(navController = navController)
+                        }
+                    }
+                ) {
+                    NavHost(navController = navController, startDestination = Screen.Home.route) {
+                        composable(Screen.Home.route) {
+                            showBottomBar(true)
+                            HomeScreen(navController, cheggViewModel)
+                        }
+                        composable(Screen.Search.route) {
+                            showBottomBar(true)
+                            SearchScreen(navController, cheggViewModel)
+                        }
+                        composable(Screen.Create.route) {
+                            showBottomBar(false)
+                            CreateScreen(navController, cheggViewModel)
+                        }
+                        composable(Screen.More.route) {
+                            showBottomBar(true)
+                            MoreScreen(navController, cheggViewModel)
+                        }
+                        composable(Screen.Deck.route +"/{deckTitle}/{cardsNum}") { backStackEntry ->
+                            val deckTitle = backStackEntry.arguments?.getString("deckTitle") ?: "invalid card"
+                            val cardsNum = backStackEntry.arguments?.getString("cardsNum")?.toInt() ?: 0
+                            showBottomBar(false)
+                            DeckScreen(navController = navController, title = deckTitle, cardsNum = cardsNum)
+                        }
+                    }
+                }
+            }
         }
+    }
+
+    private fun firebaseAuthWithGoogle(
+        idToken: String,
+        signIn: (String, String) -> Unit
+    ) { // 로그인 할 때
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential) // Firebase 에 구글 계정으로 인증
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d("Firebase", "signInWithCredential:success")
+                    signIn(auth.currentUser!!.email!!, auth.currentUser!!.displayName!!)
+                }
+                else {
+                    // If sign in fails, display a message to the user.
+                    Log.d("Firebase", "signInWithCredential:failure", task.exception)
+
+                }
+            }
     }
 }
 

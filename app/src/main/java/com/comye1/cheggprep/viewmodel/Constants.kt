@@ -10,3 +10,8 @@ enum class CreateState {
     TitleScreen, // 0
     CardScreen // 1
 }
+
+enum class MoreState {
+    MainScreen,
+    LogInScreen
+}
