@@ -38,3 +38,17 @@ Material Design이 제공하는 BottomNavigation을 사용하여 하단바 생�
 ![image](https://user-images.githubusercontent.com/52899340/137591864-a2face5f-37a0-4005-92df-ec21e9edeb2c.png)
 ![image](https://user-images.githubusercontent.com/52899340/137591934-77b81936-b194-42e1-b83e-b631c4c4211c.png)
 
+## Week6 - LifeCycle & ViewModel 이해
+state hosting 활용  
+Life Cycle와 ViewModel에 대해 배우고 UI Controller와 ViewModel의 역할과 ViewModel의 데이터 흐름 방식 이해  
+![image](https://user-images.githubusercontent.com/52899340/148230259-b211cb25-53c1-4d0c-9c77-0ff8069a9c8d.png)
+![image](https://user-images.githubusercontent.com/52899340/148230318-c1fb155d-30f9-4dab-928c-3450912be5ce.png)
+
+## Week7 - 데이터 파악 & ViewModel 적용
+앱에서 필요한 데이터들을 정리하고 샘플 데이터를 생성하여 ViewModel과 함께 사용  
+getQueryResult를 활용하여 검색 기능 구현  
+![image](https://user-images.githubusercontent.com/52899340/148231610-8fcdf95b-4726-4d64-8ebe-eb3f5a9da903.png)
+![image](https://user-images.githubusercontent.com/52899340/148231658-4fcaf625-5f96-4be3-aa93-6f35bf6896b0.png)
+
+
+
