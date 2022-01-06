@@ -1,10 +1,11 @@
 # CheggPrep_Clone
 Android팀 프로젝트 - Jetpack Compose로 플래시카드 클론하기!!  
-2021년 9월 7일 ~ 진행중
+2021년 9월 7일 ~ 11월 23일 + 추가 세션 기획 중   
 진행 : 김예원, 강인영
 <br>
 <br>
 
+# 세션 요약 카드 뉴스
 ## Week1 - Introduction  
 Kotlin과 Jetpack Compose 알아보기
 ![](https://images.velog.io/images/kiyoog02/post/0f480c0a-e1c5-46fc-8792-9e1a88835b75/%EA%B7%B8%EB%A6%BC1.png)
@@ -50,5 +51,16 @@ getQueryResult를 활용하여 검색 기능 구현
 ![image](https://user-images.githubusercontent.com/52899340/148231610-8fcdf95b-4726-4d64-8ebe-eb3f5a9da903.png)
 ![image](https://user-images.githubusercontent.com/52899340/148231658-4fcaf625-5f96-4be3-aa93-6f35bf6896b0.png)
 
+## Week8 - Repository 패턴 & Hilt 의존성 주입
+PagerLayout을 활용하여 스와이프 기능 구현  
+enum class, state 등이 활용된 Card의 Flip 기능 적용  
+Repository와 의존성에 대한 개념 이해  
+![image](https://user-images.githubusercontent.com/52899340/148348793-9c1b27ec-afe4-4b63-a29d-0ad444ab19be.png)
+![image](https://user-images.githubusercontent.com/52899340/148348912-b682b5ef-e54b-400d-81f0-8fc816708009.png)
+
+## Week9 - Firebase 연동 & Google Auth 사용
+Firebase를 Android Studio에 연결하고 Authentication 기능을 활용한 Google Sign-in 구현
+![image](https://user-images.githubusercontent.com/52899340/148350354-e113b072-2145-4291-89a9-0c4f1aabad99.png)
+![image](https://user-images.githubusercontent.com/52899340/148350420-8ccfa4ab-a186-473d-9d9b-23ef4feff38c.png)
 
 
