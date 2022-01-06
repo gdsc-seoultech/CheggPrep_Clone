@@ -1,5 +1,5 @@
 # CheggPrep_Clone
-Android팀 프로젝트 - Jetpack Compose로 플래시카드 클론하기!!  
+Android세션 프로젝트 - Jetpack Compose로 플래시카드 어플리케이션 클론하기!!  
 2021년 9월 7일 ~ 11월 23일 + 추가 세션 기획 중   
 진행 : 김예원, 강인영
 <br>
