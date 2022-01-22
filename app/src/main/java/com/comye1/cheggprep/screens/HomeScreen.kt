@@ -29,10 +29,11 @@ import com.comye1.cheggprep.models.DECK_CREATED
 import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.ui.theme.DeepOrange
+import com.comye1.cheggprep.viewmodel.HomeViewModel
 import com.comye1.cheggprep.viewmodel.MoreViewModel
 
 @Composable
-fun HomeScreen(navController: NavHostController, viewModel: MoreViewModel) {
+fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
     var (selectedFilterIndex, setFilterIndex) = remember {
         mutableStateOf(0)
     }

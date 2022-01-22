@@ -28,10 +28,11 @@ import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.viewmodel.MoreViewModel
 import com.comye1.cheggprep.viewmodel.SearchState
+import com.comye1.cheggprep.viewmodel.SearchViewModel
 
 
 @Composable
-fun SearchScreen(navController: NavHostController, viewModel: MoreViewModel) {
+fun SearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
 
     when (viewModel.searchScreenState.value) {
         SearchState.ButtonScreen -> {

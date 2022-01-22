@@ -42,45 +42,6 @@ class MoreViewModel : ViewModel() {
         _firebaseAuth.value = false
     }
 
-    var myDeckList = mutableStateListOf<Deck>()
-        private set
-
-    // SearchScreen ////////////////////////
-    var searchScreenState = mutableStateOf(SearchState.ButtonScreen)
-        private set
-
-    fun toButtonScreen() {
-        searchScreenState.value = SearchState.ButtonScreen
-    }
-
-    fun toQueryScreen() {
-        searchScreenState.value = SearchState.QueryScreen
-    }
-
-    fun toResultScreen() {
-        searchScreenState.value = SearchState.ResultScreen
-    }
-
-    var queryString = mutableStateOf("")
-        private set
-
-    fun setQueryString(query: String) {
-        queryString.value = query
-    }
-
-    // 전체 Deck
-    var totalDeckList = mutableStateListOf<Deck>()
-        private set
-
-    // Deck 검색 결과 반환
-    fun getQueryResult() = totalDeckList.filter { deck ->
-        deck.deckTitle.lowercase(Locale.getDefault())
-            .contains(queryString.value.lowercase(Locale.getDefault()))
-    }.toMutableStateList()
-    /////////////////////////////////
-
-
-
     ////////////////////////////////////
     // MoreScreen
     var moreScreenState = mutableStateOf(MoreState.MainScreen)
@@ -94,8 +55,4 @@ class MoreViewModel : ViewModel() {
         moreScreenState.value = MoreState.MainScreen
     }
 
-    init {
-        myDeckList = SampleDataSet.myDeckSample.toMutableStateList()
-        totalDeckList = SampleDataSet.totalDeckSample.toMutableStateList()
-    }
 }

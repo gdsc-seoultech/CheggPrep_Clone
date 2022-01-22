@@ -25,7 +25,9 @@ import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.screens.*
 import com.comye1.cheggprep.ui.theme.CheggPrepTheme
 import com.comye1.cheggprep.viewmodel.CreateViewModel
+import com.comye1.cheggprep.viewmodel.HomeViewModel
 import com.comye1.cheggprep.viewmodel.MoreViewModel
+import com.comye1.cheggprep.viewmodel.SearchViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -55,6 +57,8 @@ class MainActivity : ComponentActivity() {
 
                 val moreViewModel: MoreViewModel = viewModel()
                 val createViewModel: CreateViewModel = viewModel()
+                val homeViewModel: HomeViewModel = viewModel()
+                val searchViewModel: SearchViewModel = viewModel()
 
                 auth.currentUser?.let {  // currentUser가 null이 아니면 뷰모델 안의 user로 설정
                     LaunchedEffect(key1 = true) {
@@ -83,11 +87,11 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = Screen.Home.route) {
                         composable(Screen.Home.route) {
                             showBottomBar(true)
-                            HomeScreen(navController, moreViewModel)
+                            HomeScreen(navController, homeViewModel)
                         }
                         composable(Screen.Search.route) {
                             showBottomBar(true)
-                            SearchScreen(navController, moreViewModel)
+                            SearchScreen(navController, searchViewModel)
                         }
                         composable(Screen.Create.route) {
                             showBottomBar(false)
