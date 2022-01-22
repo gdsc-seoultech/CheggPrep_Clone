@@ -24,9 +24,10 @@ import com.comye1.cheggprep.navigation.BottomNavigationBar
 import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.screens.*
 import com.comye1.cheggprep.ui.theme.CheggPrepTheme
-import com.comye1.cheggprep.viewmodel.CheggViewModel
+import com.comye1.cheggprep.viewmodel.MoreViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -39,6 +40,7 @@ import com.google.firebase.ktx.Firebase
 class MainActivity : ComponentActivity() {
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var user: FirebaseUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,19 +52,20 @@ class MainActivity : ComponentActivity() {
             CheggPrepTheme {
                 val navController = rememberNavController()
 
-                val cheggViewModel: CheggViewModel = viewModel()
+                val moreViewModel: MoreViewModel = viewModel()
 
                 auth.currentUser?.let {  // currentUser가 null이 아니면 뷰모델 안의 user로 설정
                     LaunchedEffect(key1 = true) {
-                        cheggViewModel.signIn(it.email!!, it.displayName!!)
+                        moreViewModel.signIn(it.email!!, it.displayName!!)
+                        user = FirebaseAuth.getInstance().currentUser!!
                     }
                 }
 
-                val firebaseAuth = cheggViewModel.firebaseAuth.collectAsState()
+                val firebaseAuth = moreViewModel.firebaseAuth.collectAsState()
 
                 if (firebaseAuth.value) { // firebaseAuth가 true일 때
-                    firebaseAuthWithGoogle(cheggViewModel.token.value, cheggViewModel::signIn)
-                    cheggViewModel.completeAuth() // 로그인 후 false로 변경
+                    firebaseAuthWithGoogle(moreViewModel.token.value, moreViewModel::signIn)
+                    moreViewModel.completeAuth() // 로그인 후 false로 변경
                 }
 
                 val (bottomBarShown, showBottomBar) = remember {
@@ -78,19 +81,19 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = Screen.Home.route) {
                         composable(Screen.Home.route) {
                             showBottomBar(true)
-                            HomeScreen(navController, cheggViewModel)
+                            HomeScreen(navController, moreViewModel)
                         }
                         composable(Screen.Search.route) {
                             showBottomBar(true)
-                            SearchScreen(navController, cheggViewModel)
+                            SearchScreen(navController, moreViewModel)
                         }
                         composable(Screen.Create.route) {
                             showBottomBar(false)
-                            CreateScreen(navController, cheggViewModel)
+                            CreateScreen(navController, moreViewModel)
                         }
                         composable(Screen.More.route) {
                             showBottomBar(true)
-                            MoreScreen(navController, cheggViewModel)
+                            MoreScreen(navController, moreViewModel)
                         }
                         composable(Screen.Deck.route +"/{deckTitle}/{cardsNum}") { backStackEntry ->
                             val deckTitle = backStackEntry.arguments?.getString("deckTitle") ?: "invalid card"

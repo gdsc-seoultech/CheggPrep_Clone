@@ -24,16 +24,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.comye1.cheggprep.SampleDataSet
 import com.comye1.cheggprep.models.DECK_ADDED
 import com.comye1.cheggprep.models.DECK_CREATED
 import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.ui.theme.DeepOrange
-import com.comye1.cheggprep.viewmodel.CheggViewModel
+import com.comye1.cheggprep.viewmodel.MoreViewModel
 
 @Composable
-fun HomeScreen(navController: NavHostController, viewModel: CheggViewModel) {
+fun HomeScreen(navController: NavHostController, viewModel: MoreViewModel) {
     var (selectedFilterIndex, setFilterIndex) = remember {
         mutableStateOf(0)
     }

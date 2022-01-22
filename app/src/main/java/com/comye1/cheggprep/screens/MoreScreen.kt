@@ -1,6 +1,5 @@
 package com.comye1.cheggprep.screens
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -16,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.LightOrange
-import com.comye1.cheggprep.viewmodel.CheggViewModel
+import com.comye1.cheggprep.viewmodel.MoreViewModel
 import com.comye1.cheggprep.viewmodel.MoreState
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -28,7 +27,7 @@ fun Modifier.moreModifier(onClick: () -> Unit) = this
 
 @ExperimentalMaterialApi
 @Composable
-fun MoreScreen(navController: NavHostController, viewModel: CheggViewModel) {
+fun MoreScreen(navController: NavHostController, viewModel: MoreViewModel) {
 
     // 뷰모델에서 user 가져오기
     val user = remember {

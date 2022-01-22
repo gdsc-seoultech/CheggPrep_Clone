@@ -21,7 +21,7 @@ import androidx.navigation.NavHostController
 import com.comye1.cheggprep.models.Card
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.LightOrange
-import com.comye1.cheggprep.viewmodel.CheggViewModel
+import com.comye1.cheggprep.viewmodel.MoreViewModel
 import com.comye1.cheggprep.viewmodel.CreateState
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -30,7 +30,7 @@ import com.google.accompanist.pager.rememberPagerState
 @ExperimentalPagerApi
 @ExperimentalComposeUiApi
 @Composable
-fun CreateScreen(navController: NavHostController, viewModel: CheggViewModel) {
+fun CreateScreen(navController: NavHostController, viewModel: MoreViewModel) {
 
     val (deckTitle, setDeckTitle) = remember {
         mutableStateOf("")

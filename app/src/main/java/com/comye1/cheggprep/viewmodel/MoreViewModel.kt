@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.*
 
-class CheggViewModel : ViewModel() {
+class MoreViewModel : ViewModel() {
 
     // SignIn
     private val _user: MutableStateFlow<User?> = MutableStateFlow(null)

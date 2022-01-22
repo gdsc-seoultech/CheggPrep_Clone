@@ -23,17 +23,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.comye1.cheggprep.models.DECK_ADDED
-import com.comye1.cheggprep.models.DECK_CREATED
 import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.ui.theme.DeepOrange
-import com.comye1.cheggprep.viewmodel.CheggViewModel
+import com.comye1.cheggprep.viewmodel.MoreViewModel
 import com.comye1.cheggprep.viewmodel.SearchState
 
 
 @Composable
-fun SearchScreen(navController: NavHostController, viewModel: CheggViewModel) {
+fun SearchScreen(navController: NavHostController, viewModel: MoreViewModel) {
 
     when (viewModel.searchScreenState.value) {
         SearchState.ButtonScreen -> {

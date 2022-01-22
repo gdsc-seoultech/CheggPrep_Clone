@@ -1,6 +1,5 @@
 package com.comye1.cheggprep.screens
 
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -16,14 +15,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.comye1.cheggprep.R
 import com.comye1.cheggprep.utils.AuthResultContract
-import com.comye1.cheggprep.viewmodel.CheggViewModel
+import com.comye1.cheggprep.viewmodel.MoreViewModel
 import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.launch
 
 
 @ExperimentalMaterialApi
 @Composable
-fun SignInScreen(viewModel: CheggViewModel) {
+fun SignInScreen(viewModel: MoreViewModel) {
     val coroutineScope = rememberCoroutineScope()
     var text by remember {
         mutableStateOf<String?>(null)
@@ -69,7 +68,9 @@ fun SignInView(errorText: String?, onClick: () -> Unit) {
         GoogleSignInButtonUi(
             text = "Sign Up With Google",
             loadingText = "Signing In....",
-            onClicked = onClick
+            onClicked = {
+                onClick()
+            }
             // authResultLauncer launch : SignIn Intent 실행 및 결과 처리 (AuthResultContract)
         )
         errorText?.let { // errorText가 전달된 경우 이를 표시
