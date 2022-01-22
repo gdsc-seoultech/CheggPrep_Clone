@@ -79,15 +79,7 @@ class MoreViewModel : ViewModel() {
     }.toMutableStateList()
     /////////////////////////////////
 
-    // CreateScreen /////////////////
-    var createScreenState = mutableStateOf(CreateState.TitleScreen)
-        private set
 
-
-
-    fun toCardScreen() {
-        createScreenState.value = CreateState.CardScreen
-    }
 
     ////////////////////////////////////
     // MoreScreen

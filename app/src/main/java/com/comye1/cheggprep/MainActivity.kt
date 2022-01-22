@@ -24,6 +24,7 @@ import com.comye1.cheggprep.navigation.BottomNavigationBar
 import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.screens.*
 import com.comye1.cheggprep.ui.theme.CheggPrepTheme
+import com.comye1.cheggprep.viewmodel.CreateViewModel
 import com.comye1.cheggprep.viewmodel.MoreViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.firebase.auth.FirebaseAuth
@@ -53,6 +54,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 val moreViewModel: MoreViewModel = viewModel()
+                val createViewModel: CreateViewModel = viewModel()
 
                 auth.currentUser?.let {  // currentUser가 null이 아니면 뷰모델 안의 user로 설정
                     LaunchedEffect(key1 = true) {
@@ -89,7 +91,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Screen.Create.route) {
                             showBottomBar(false)
-                            CreateScreen(navController, moreViewModel)
+                            CreateScreen(navController, createViewModel)
                         }
                         composable(Screen.More.route) {
                             showBottomBar(true)

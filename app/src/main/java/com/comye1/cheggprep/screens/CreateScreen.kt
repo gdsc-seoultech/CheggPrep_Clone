@@ -23,6 +23,7 @@ import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.LightOrange
 import com.comye1.cheggprep.viewmodel.MoreViewModel
 import com.comye1.cheggprep.viewmodel.CreateState
+import com.comye1.cheggprep.viewmodel.CreateViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -30,7 +31,7 @@ import com.google.accompanist.pager.rememberPagerState
 @ExperimentalPagerApi
 @ExperimentalComposeUiApi
 @Composable
-fun CreateScreen(navController: NavHostController, viewModel: MoreViewModel) {
+fun CreateScreen(navController: NavHostController, viewModel: CreateViewModel) {
 
     val (deckTitle, setDeckTitle) = remember {
         mutableStateOf("")
@@ -69,7 +70,7 @@ fun CreateScreen(navController: NavHostController, viewModel: MoreViewModel) {
                     if (cardList.size == 0) cardList.add(Card("", ""))
                     // 삭제된 뒤에 cardList 사이즈가 0인 경우 새 Card 추가
                 },
-                navigateBack = { navController.popBackStack() },
+                navigateBack = { viewModel.toTitleScreen() },
                 onDone = { Log.d("cardList", cardList.joinToString("\n")) }
             )
         }
