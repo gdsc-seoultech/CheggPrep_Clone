@@ -1,15 +1,10 @@
 package com.comye1.cheggprep.viewmodel
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
-import com.comye1.cheggprep.SampleDataSet
-import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.models.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.util.*
 
 class MoreViewModel : ViewModel() {
 
@@ -17,7 +12,7 @@ class MoreViewModel : ViewModel() {
     private val _user: MutableStateFlow<User?> = MutableStateFlow(null)
     val user: StateFlow<User?> = _user
 
-    fun signIn(email: String, displayName: String){
+    fun signIn(email: String, displayName: String) {
         _user.value = User(email, displayName)
         //
     }
@@ -26,6 +21,7 @@ class MoreViewModel : ViewModel() {
     fun signOut() {
         _user.value = null
     }
+
     // MainActivity에서 firebaseAuth 호출하기
     private val _firebaseAuth = MutableStateFlow(false)
     val firebaseAuth = _firebaseAuth

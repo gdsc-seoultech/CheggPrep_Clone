@@ -21,7 +21,6 @@ import androidx.navigation.NavHostController
 import com.comye1.cheggprep.models.Card
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.LightOrange
-import com.comye1.cheggprep.viewmodel.MoreViewModel
 import com.comye1.cheggprep.viewmodel.CreateState
 import com.comye1.cheggprep.viewmodel.CreateViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -71,7 +70,10 @@ fun CreateScreen(navController: NavHostController, viewModel: CreateViewModel) {
                     // 삭제된 뒤에 cardList 사이즈가 0인 경우 새 Card 추가
                 },
                 navigateBack = { viewModel.toTitleScreen() },
-                onDone = { Log.d("cardList", cardList.joinToString("\n")) }
+                onDone = {
+                    Log.d("cardList", cardList.joinToString("\n"))
+                    viewModel.writeNewDeck(cardList)
+                }
             )
         }
     }
@@ -106,40 +108,40 @@ fun CreateCardScreen(
 
     Scaffold(
         topBar = {
-        TopAppBar(
-            elevation = 0.dp,
-            backgroundColor = Color.Transparent,
-            title = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "${pagerState.currentPage + 1}/${pagerState.pageCount}", //
-                        style = MaterialTheme.typography.h5,
-                        fontWeight = FontWeight.Bold
-                    )
+            TopAppBar(
+                elevation = 0.dp,
+                backgroundColor = Color.Transparent,
+                title = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "${pagerState.currentPage + 1}/${pagerState.pageCount}", //
+                            style = MaterialTheme.typography.h5,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = navigateBack) {
+                        Icon(
+                            imageVector = Icons.Outlined.Close,
+                            contentDescription = "close create screen"
+                        )
+                    }
+                },
+                actions = {
+                    TextButton(onClick = onDone) {
+                        Text(
+                            "Done",
+                            style = MaterialTheme.typography.h6,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
-            },
-            navigationIcon = {
-                IconButton(onClick = navigateBack) {
-                    Icon(
-                        imageVector = Icons.Outlined.Close,
-                        contentDescription = "close create screen"
-                    )
-                }
-            },
-            actions = {
-                TextButton(onClick = onDone) {
-                    Text(
-                        "Done",
-                        style = MaterialTheme.typography.h6,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        )
-    },
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = addCard, // 카드 추가

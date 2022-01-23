@@ -2,6 +2,7 @@ package com.comye1.cheggprep
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
@@ -14,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -33,6 +35,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 // TODO : BottomNavigationBar scale / popUpTo 옵션 지정
@@ -77,6 +81,14 @@ class MainActivity : ComponentActivity() {
                 val (bottomBarShown, showBottomBar) = remember {
                     mutableStateOf(true)
                 }
+
+                /*
+                firebase 저장 실험
+                 */
+//                Firebase.database.reference.child("all").setValue("sample").addOnSuccessListener {
+//                    Toast.makeText(this, "firebase", Toast.LENGTH_LONG).show()
+//                }
+
                 Scaffold(
                     bottomBar = {
                         if(bottomBarShown){
