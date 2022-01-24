@@ -115,7 +115,7 @@ fun SearchResultScreen(
 
 @Composable
 fun DeckInResult(
-    deck: Deck,
+    deck: Deck, // TODO : DeckForAll을 받도록
     modifier: Modifier = Modifier,
     onClick: (Deck) -> Unit
 ) {
