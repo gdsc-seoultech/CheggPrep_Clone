@@ -5,6 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.comye1.cheggprep.models.Card
 import com.comye1.cheggprep.models.Deck
+import com.comye1.cheggprep.models.DeckForAll
+import com.comye1.cheggprep.models.DeckForUser
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -12,16 +15,20 @@ import com.google.firebase.ktx.Firebase
 class CreateViewModel: ViewModel() {
 
     private val database = Firebase.database.reference
-
+    private val user = FirebaseAuth.getInstance().currentUser!!
     /*
     RDB에 새로운 Deck 생성 - All 및 User에 저장해야 함.
      */
-    fun writeNewDeck(cardList: List<Card>) {
-        val key = database.child("all").push().key
-        database.child("all").child(key.toString()).setValue(cardList).addOnCompleteListener {
+    fun writeNewDeck(deck: Deck) {
+        val key = database.child("all/decks").push().key
+        val deckForAll = DeckForAll(deckTitle = deck.deckTitle, shared = deck.shared, cardList = deck.cardList)
+        val deckForUser = DeckForUser(deckType = deck.deckType, bookmarked = deck.bookmarked)
+        database.child("all/decks").child(key.toString()).setValue(deckForAll).addOnCompleteListener {
             Log.d("firebase", "success")
         }
-
+        database.child("user/${user.uid}/decks").child(key.toString()).setValue(deckForUser).addOnCompleteListener {
+            Log.d("firebase", "success")
+        }
     }
 
     // CreateScreen /////////////////

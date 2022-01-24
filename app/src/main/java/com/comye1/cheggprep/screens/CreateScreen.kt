@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import com.comye1.cheggprep.models.Card
+import com.comye1.cheggprep.models.DECK_CREATED
+import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.LightOrange
 import com.comye1.cheggprep.viewmodel.CreateState
@@ -72,7 +74,15 @@ fun CreateScreen(navController: NavHostController, viewModel: CreateViewModel) {
                 navigateBack = { viewModel.toTitleScreen() },
                 onDone = {
                     Log.d("cardList", cardList.joinToString("\n"))
-                    viewModel.writeNewDeck(cardList)
+                    viewModel.writeNewDeck(
+                        Deck(
+                            deckType = DECK_CREATED,
+                            deckTitle = deckTitle,
+                            bookmarked = false,
+                            shared = visibility,
+                            cardList = cardList
+                        )
+                    )
                 }
             )
         }
