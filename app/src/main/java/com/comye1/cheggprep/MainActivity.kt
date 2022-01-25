@@ -2,7 +2,6 @@ package com.comye1.cheggprep
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
@@ -15,12 +14,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.comye1.cheggprep.navigation.BottomNavigationBar
 import com.comye1.cheggprep.navigation.Screen
@@ -35,8 +35,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 // TODO : BottomNavigationBar scale / popUpTo 옵션 지정
@@ -91,7 +89,7 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     bottomBar = {
-                        if(bottomBarShown){
+                        if (bottomBarShown) {
                             BottomNavigationBar(navController = navController)
                         }
                     }
@@ -113,11 +111,19 @@ class MainActivity : ComponentActivity() {
                             showBottomBar(true)
                             MoreScreen(navController, moreViewModel)
                         }
-                        composable(Screen.Deck.route +"/{deckTitle}/{cardsNum}") { backStackEntry ->
-                            val deckTitle = backStackEntry.arguments?.getString("deckTitle") ?: "invalid card"
-                            val cardsNum = backStackEntry.arguments?.getString("cardsNum")?.toInt() ?: 0
+                        composable(
+                            Screen.Deck.route + "/{key}",
+                            arguments = listOf(navArgument("key") {
+                                type = NavType.StringType
+                                defaultValue = ""
+                            })
+                        ) { backStackEntry ->
+                            val key = backStackEntry.arguments?.getString("key") ?: ""
                             showBottomBar(false)
-                            DeckScreen(navController = navController, title = deckTitle, cardsNum = cardsNum)
+                            DeckScreen(
+                                navController = navController,
+                                key = key
+                            )
                         }
                     }
                 }
@@ -136,8 +142,7 @@ class MainActivity : ComponentActivity() {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("Firebase", "signInWithCredential:success")
                     signIn(auth.currentUser!!.email!!, auth.currentUser!!.displayName!!)
-                }
-                else {
+                } else {
                     // If sign in fails, display a message to the user.
                     Log.d("Firebase", "signInWithCredential:failure", task.exception)
 

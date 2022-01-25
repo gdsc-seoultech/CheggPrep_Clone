@@ -21,6 +21,7 @@ import androidx.navigation.NavHostController
 import com.comye1.cheggprep.models.Card
 import com.comye1.cheggprep.models.DECK_CREATED
 import com.comye1.cheggprep.models.Deck
+import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.LightOrange
 import com.comye1.cheggprep.viewmodel.CreateState
@@ -74,7 +75,7 @@ fun CreateScreen(navController: NavHostController, viewModel: CreateViewModel) {
                 navigateBack = { viewModel.toTitleScreen() },
                 onDone = {
                     Log.d("cardList", cardList.joinToString("\n"))
-                    viewModel.writeNewDeck(
+                    val key = viewModel.writeNewDeck(
                         Deck(
                             deckType = DECK_CREATED,
                             deckTitle = deckTitle,
@@ -82,6 +83,9 @@ fun CreateScreen(navController: NavHostController, viewModel: CreateViewModel) {
                             shared = visibility,
                             cardList = cardList
                         )
+                    )
+                    navController.navigate(
+                        Screen.Deck.route + "/$key"
                     )
                 }
             )

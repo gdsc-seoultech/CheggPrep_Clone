@@ -60,7 +60,7 @@ fun SearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
                 toButtonScreen = viewModel::toButtonScreen,
                 toDeckScreen = {
                     navController.navigate(
-                        Screen.Deck.route + "/${it.deckTitle}/${it.cardList.size}"
+                        Screen.Deck.route + "/${it.key}"
                     )
                 }
             )

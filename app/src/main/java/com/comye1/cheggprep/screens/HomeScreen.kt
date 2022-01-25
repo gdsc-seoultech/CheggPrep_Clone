@@ -67,7 +67,7 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
                             DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
                             {
                                 navController.navigate(
-                                    Screen.Deck.route + "/${it.deckTitle}/${it.cardList.size}"
+                                    Screen.Deck.route + "/${it.key}"
                                 )
                             }
                         }
@@ -78,7 +78,7 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
                             DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
                             {
                                 navController.navigate(
-                                    Screen.Deck.route + "/${it.deckTitle}/${it.cardList.size}"
+                                    Screen.Deck.route + "/${it.key}"
                                 )
                             }
                         }
@@ -89,7 +89,7 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
                             DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
                             {
                                 navController.navigate(
-                                    Screen.Deck.route + "/${it.deckTitle}/${it.cardList.size}"
+                                    Screen.Deck.route + "/${it.key}"
                                 )
                             }
                         }
