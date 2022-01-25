@@ -142,7 +142,7 @@ fun DeckInResult(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = deck.cardList.size.toString() + if (deck.cardList.size > 1) " Cards" else "Card",
+                text = deck.cardList.size.toString() + if (deck.cardList.size > 1) " Cards" else " Card",
                 style = MaterialTheme.typography.subtitle1,
                 fontWeight = FontWeight.Bold,
                 color = Color.Gray

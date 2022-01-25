@@ -30,7 +30,6 @@ import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.viewmodel.HomeViewModel
-import com.comye1.cheggprep.viewmodel.MoreViewModel
 
 @Composable
 fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
@@ -95,7 +94,12 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
                         }
                     }
             }
-            item { MakeMyDeck(onClick = {navController.navigate(Screen.Create.route)}) }
+            item { MakeMyDeck(onClick = { navController.navigate(Screen.Create.route) }) }
+            item { 
+                Column(Modifier.height(50.dp)) {
+                    
+                }
+            }
         }
     }
 }
@@ -189,7 +193,7 @@ fun DeckItem(deck: Deck, modifier: Modifier = Modifier, onClick: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = deck.cardList.size.toString() + if (deck.cardList.size > 1) " Cards" else "Card",
+                text = deck.cardList.size.toString() + if (deck.cardList.size > 1) " Cards" else " Card",
                 style = MaterialTheme.typography.subtitle1,
                 fontWeight = FontWeight.Bold,
                 color = Color.Gray

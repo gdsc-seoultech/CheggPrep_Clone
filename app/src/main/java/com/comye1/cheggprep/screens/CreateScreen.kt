@@ -84,6 +84,7 @@ fun CreateScreen(navController: NavHostController, viewModel: CreateViewModel) {
                             cardList = cardList
                         )
                     )
+                    navController.popBackStack() // 생성 완료 후 Create로 다시 돌아가지 않도록
                     navController.navigate(
                         Screen.Deck.route + "/$key"
                     )
