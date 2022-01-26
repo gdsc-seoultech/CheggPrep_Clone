@@ -5,18 +5,23 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.LightOrange
-import com.comye1.cheggprep.viewmodel.MoreViewModel
+import com.comye1.cheggprep.utils.getGoogleSignInClient
 import com.comye1.cheggprep.viewmodel.MoreState
+import com.comye1.cheggprep.viewmodel.MoreViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -34,7 +39,7 @@ fun MoreScreen(navController: NavHostController, viewModel: MoreViewModel) {
         viewModel.user
     }.collectAsState()
 
-
+    val context = LocalContext.current
 
     val (notified, setNotified) = remember {
         mutableStateOf(true)
@@ -73,6 +78,7 @@ fun MoreScreen(navController: NavHostController, viewModel: MoreViewModel) {
                             signText = "Sign out",
                             signFunction = {
                                 Firebase.auth.signOut() // 로그아웃
+                                getGoogleSignInClient(context).signOut()
                                 viewModel.signOut()
                             }
                         )
