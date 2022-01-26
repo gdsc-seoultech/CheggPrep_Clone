@@ -61,6 +61,7 @@ fun CreateScreen(navController: NavHostController, viewModel: CreateViewModel) {
             )
         }
         CreateState.CardScreen -> {
+            if(deckTitle.isEmpty()) viewModel.toTitleScreen()
             CreateCardScreen(
                 cardList = cardList, //SnapshotStateList<Card>가 전달된다
                 setCard = { index, card ->
@@ -84,6 +85,7 @@ fun CreateScreen(navController: NavHostController, viewModel: CreateViewModel) {
                             cardList = cardList
                         )
                     )
+                    viewModel.toTitleScreen() // 화면 TitleScreen으로 복귀
                     navController.popBackStack() // 생성 완료 후 Create로 다시 돌아가지 않도록
                     navController.navigate(
                         Screen.Deck.route + "/$key"

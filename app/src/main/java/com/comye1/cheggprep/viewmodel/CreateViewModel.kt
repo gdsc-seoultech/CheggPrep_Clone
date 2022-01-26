@@ -32,7 +32,6 @@ class CreateViewModel : ViewModel() {
                 Log.d("firebase", "success")
             }
         // TODO 실패 처리 어떻게 하냐..
-        // TODO 상세화면으로 이동
         return key
     }
 
