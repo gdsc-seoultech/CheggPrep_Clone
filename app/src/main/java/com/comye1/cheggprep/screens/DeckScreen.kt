@@ -8,11 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,16 +17,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.comye1.cheggprep.SampleDataSet
-import com.comye1.cheggprep.models.Card
-import com.comye1.cheggprep.models.Deck
-import com.comye1.cheggprep.models.DeckForAll
-import com.comye1.cheggprep.models.DeckForUser
+import com.comye1.cheggprep.models.*
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
@@ -47,23 +37,37 @@ fun DeckScreen(navController: NavController, key: String) {
     val user = FirebaseAuth.getInstance().currentUser!!
 
     database.child("all/decks/$key").get().addOnSuccessListener { all ->
+
+        val deckForAll = all.getValue(DeckForAll::class.java)
+        var deckForUser: DeckForUser? = null
+
         database.child("user/${user.uid}/decks/$key").get().addOnSuccessListener { user ->
             Log.d("firebase all", all.toString())
             Log.d("firebase user", user.toString())
 
-            val deckForAll = all.getValue(DeckForAll::class.java)
-            val deckForUser = user.getValue(DeckForUser::class.java)
+            deckForUser = user.getValue(DeckForUser::class.java)
 
             if (deckForAll != null && deckForUser != null) {
                 deck = Deck(
                     deckTitle = deckForAll.deckTitle,
-                    deckType = deckForUser.deckType,
+                    deckType = deckForUser!!.deckType,
                     cardList = deckForAll.cardList,
-                    bookmarked = deckForUser.bookmarked,
+                    bookmarked = deckForUser!!.bookmarked,
                     shared = deckForAll.shared,
                     key = key
                 )
             }
+        }
+
+        if (deckForAll != null && deckForUser == null) {
+            deck = Deck(
+                deckTitle = deckForAll.deckTitle,
+                deckType = -1,
+                cardList = deckForAll.cardList,
+                bookmarked = false,
+                shared = deckForAll.shared,
+                key = key
+            )
         }
     }
 
@@ -85,8 +89,29 @@ fun DeckScreen(navController: NavController, key: String) {
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(imageVector = Icons.Default.Share, contentDescription = "share")
                     }
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "more")
+                    if (deck.deckType == DECK_CREATED) {
+                        IconButton(onClick = { /*TODO*/ }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "more"
+                            )
+                        }
+                    } else {
+                        if (deck.bookmarked) {
+                            IconButton(onClick = { /*TODO*/ }) {
+                                Icon(
+                                    imageVector = Icons.Default.Bookmark,
+                                    contentDescription = "add bookmark"
+                                )
+                            }
+                        } else {
+                            IconButton(onClick = { /*TODO*/ }) {
+                                Icon(
+                                    imageVector = Icons.Default.BookmarkBorder,
+                                    contentDescription = "add bookmark"
+                                )
+                            }
+                        }
                     }
                 }
             )
