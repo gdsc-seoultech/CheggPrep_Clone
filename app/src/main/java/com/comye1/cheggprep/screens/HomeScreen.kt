@@ -1,10 +1,12 @@
 package com.comye1.cheggprep.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -18,6 +20,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -30,13 +33,16 @@ import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.viewmodel.HomeViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
     var (selectedFilterIndex, setFilterIndex) = remember {
         mutableStateOf(0)
     }
-    viewModel.getUserDecks()
+
+    val lazyListState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -59,47 +65,65 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
             }
         }
     ) {
-        LazyColumn(modifier = Modifier.padding(16.dp)) {
-            when (selectedFilterIndex) {
-                0 ->
-                    viewModel.myDeckList.forEach {
-                        item {
-                            DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
-                            {
-                                navController.navigate(
-                                    Screen.Deck.route + "/${it.key}"
-                                )
+        LazyColumn(
+            modifier = Modifier.padding(16.dp),
+//            reverseLayout = true, // 최신 Deck를 위로
+            state = lazyListState
+        ) {
+            Log.d("homescreen", viewModel.myDeckList.joinToString("//"))
+            /*
+            key 역순으로 (최신순) 정렬
+             */
+            viewModel.myDeckList.sortedByDescending { it.key }.let { list ->
+                when (selectedFilterIndex) {
+                    0 ->
+                        list.forEach {
+                            item(key = it.key) {
+                                DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
+                                {
+                                    navController.navigate(
+                                        Screen.Deck.route + "/${it.key}"
+                                    )
+                                }
+                            }
+
+                        }
+                    1 ->
+                        list.filter { it.bookmarked }.forEach {
+                            item(key = it.key) {
+                                DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
+                                {
+                                    navController.navigate(
+                                        Screen.Deck.route + "/${it.key}"
+                                    )
+                                }
                             }
                         }
-                    }
-                1 ->
-                    viewModel.myDeckList.filter { it.bookmarked }.forEach {
-                        item {
-                            DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
-                            {
-                                navController.navigate(
-                                    Screen.Deck.route + "/${it.key}"
-                                )
+
+                    2 ->
+                        list.filter { it.deckType == DECK_CREATED }.forEach {
+                            item(key = it.key) {
+                                DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
+                                {
+                                    navController.navigate(
+                                        Screen.Deck.route + "/${it.key}"
+                                    )
+                                }
                             }
                         }
-                    }
-                2 ->
-                    viewModel.myDeckList.filter { it.deckType == DECK_CREATED }.forEach {
-                        item {
-                            DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
-                            {
-                                navController.navigate(
-                                    Screen.Deck.route + "/${it.key}"
-                                )
-                            }
-                        }
-                    }
+                }
+
             }
             item { MakeMyDeck(onClick = { navController.navigate(Screen.Create.route) }) }
-            item { 
-                Column(Modifier.height(50.dp)) {
-                    
-                }
+            item {
+                Spacer(modifier = Modifier.height(50.dp))
+            }
+
+            /*
+            스크롤을 맨 위로
+             */
+            scope.launch {
+                lazyListState.scrollToItem(0)
             }
         }
     }

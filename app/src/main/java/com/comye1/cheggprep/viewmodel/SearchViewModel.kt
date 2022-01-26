@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.comye1.cheggprep.models.Card
-import com.comye1.cheggprep.models.DECK_CREATED
 import com.comye1.cheggprep.models.Deck
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -45,7 +44,6 @@ class SearchViewModel : ViewModel() {
         deck.deckTitle.lowercase(Locale.getDefault())
             .contains(queryString.value.lowercase(Locale.getDefault()))
     }.toMutableStateList()
-    /////////////////////////////////
 
     companion object {
         /*
@@ -61,7 +59,10 @@ class SearchViewModel : ViewModel() {
          */
         database.child("all/decks").get().addOnSuccessListener { all ->
             Log.d("search firebase", all.toString())
-//            if (all.value != null) {
+            /*
+            아무것도 없을 때..아무것도 안 보여줌..
+             */
+            if (all.value != null) {
                 val decks = all.value as HashMap<String, *>
                 decks.keys.forEach { key ->
                     val deckForAll = decks[key] as HashMap<*, *>
@@ -78,11 +79,8 @@ class SearchViewModel : ViewModel() {
                             key = key
                         )
                     )
-//                }
+                }
             }
-
         }
-
-
     }
 }
