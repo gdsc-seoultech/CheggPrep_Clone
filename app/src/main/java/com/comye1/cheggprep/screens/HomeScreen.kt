@@ -36,6 +36,7 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
     var (selectedFilterIndex, setFilterIndex) = remember {
         mutableStateOf(0)
     }
+    viewModel.getUserDecks()
 
     Scaffold(
         topBar = {

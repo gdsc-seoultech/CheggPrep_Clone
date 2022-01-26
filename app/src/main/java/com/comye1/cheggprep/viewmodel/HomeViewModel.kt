@@ -28,47 +28,50 @@ class HomeViewModel : ViewModel() {
 
     }
 
-    init {
+    fun getUserDecks() {
         /*
         User안에 있는 Deck들 가져오기... 이제 업뎃도 해야 한다
          */
-
+        val newDeckList = mutableStateListOf<Deck>()
         database.child("user/${user.uid}/decks").addValueEventListener(
             object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val deckForUserList = snapshot.value as HashMap<String, DeckForUser>
-                    Log.d("firebase user list", deckForUserList.toString())
+                    if(snapshot.value != null) {
+                        val deckForUserList = snapshot.value as HashMap<String, DeckForUser>
+                        Log.d("firebase user list", deckForUserList.toString())
 
-                    deckForUserList.keys.sorted().forEach { key ->
+                        deckForUserList.keys.sorted().forEach { key ->
 //                Log.d("firebase user iteration", "##")
-                        // it.value는 DeckForAll
-                        val deckForUser = deckForUserList[key] as HashMap<*, *>
+                            // it.value는 DeckForAll
+                            val deckForUser = deckForUserList[key] as HashMap<*, *>
 //                Log.d("deckForUser", "$key , ${deckForUser["deckType"]}")
 
-                        database.child("all/decks/$key").get().addOnSuccessListener { all ->
-                            // all.value는 DeckForUser
-                            val deckForAll = all.value as HashMap<*, *>
+                            database.child("all/decks/$key").get().addOnSuccessListener { all ->
+                                // all.value는 DeckForUser
+                                val deckForAll = all.value as HashMap<*, *>
 
-                            // 사용자의 Deck 이거나 (deckType == 0)
-                            // 다른 사용자의 Deck 이면서 공유된 것 (shared == true)
-                            val deckType = (deckForUser["deckType"] as Long).toInt()
-                            val shared = deckForAll["shared"] as Boolean
+                                // 사용자의 Deck 이거나 (deckType == 0)
+                                // 다른 사용자의 Deck 이면서 공유된 것 (shared == true)
+                                val deckType = (deckForUser["deckType"] as Long).toInt()
+                                val shared = deckForAll["shared"] as Boolean
 
-                            if (deckType == DECK_CREATED || shared) {
-                                myDeckList.add(
-                                    Deck(
-                                        deckType = deckType,
-                                        deckTitle = deckForAll["deckTitle"] as String,
-                                        cardList = deckForAll["cardList"] as List<Card>,
-                                        bookmarked = deckForUser["bookmarked"] as Boolean,
-                                        shared = shared,
-                                        key = key
+                                if (deckType == DECK_CREATED || shared) {
+                                    newDeckList.add(
+                                        Deck(
+                                            deckType = deckType,
+                                            deckTitle = deckForAll["deckTitle"] as String,
+                                            cardList = deckForAll["cardList"] as List<Card>,
+                                            bookmarked = deckForUser["bookmarked"] as Boolean,
+                                            shared = shared,
+                                            key = key
+                                        )
                                     )
-                                )
+                                }
                             }
-                        }
 
+                        }
                     }
+
 
                 }
 
@@ -77,37 +80,40 @@ class HomeViewModel : ViewModel() {
                 }
             }
         )
-
-//        database.child("user/${user.uid}/decks").get().addOnSuccessListener { user ->
-////            Log.d("home firebase user", user.toString())
-//            val deckForUserList = user.value as HashMap<String, DeckForUser>
-//            Log.d("firebase user list", deckForUserList.toString())
-//
-//            deckForUserList.keys.sorted().forEach { key ->
-////                Log.d("firebase user iteration", "##")
-//                // it.value는 DeckForAll
-//                val deckForUser = deckForUserList[key] as HashMap<*, *>
-////                Log.d("deckForUser", "$key , ${deckForUser["deckType"]}")
-//
-//                database.child("all/decks/$key").get().addOnSuccessListener { all ->
-//                    // all.value는 DeckForUser
-//                    val deckForAll = all.value as HashMap<*, *>
-//
-//                    myDeckList.add(
-//                        Deck(
-//                            deckType = (deckForUser["deckType"] as Long).toInt(),
-//                            deckTitle = deckForAll["deckTitle"] as String,
-//                            cardList = deckForAll["cardList"] as List<Card>,
-//                            bookmarked = deckForUser["bookmarked"] as Boolean,
-//                            shared = deckForAll["shared"] as Boolean,
-//                            key = key
-//                        )
-//                    )
-//                }
-//
-//            }
-////
-//        }
-
+        myDeckList = newDeckList
     }
+
+//    init {
+////        database.child("user/${user.uid}/decks").get().addOnSuccessListener { user ->
+//////            Log.d("home firebase user", user.toString())
+////            val deckForUserList = user.value as HashMap<String, DeckForUser>
+////            Log.d("firebase user list", deckForUserList.toString())
+////
+////            deckForUserList.keys.sorted().forEach { key ->
+//////                Log.d("firebase user iteration", "##")
+////                // it.value는 DeckForAll
+////                val deckForUser = deckForUserList[key] as HashMap<*, *>
+//////                Log.d("deckForUser", "$key , ${deckForUser["deckType"]}")
+////
+////                database.child("all/decks/$key").get().addOnSuccessListener { all ->
+////                    // all.value는 DeckForUser
+////                    val deckForAll = all.value as HashMap<*, *>
+////
+////                    myDeckList.add(
+////                        Deck(
+////                            deckType = (deckForUser["deckType"] as Long).toInt(),
+////                            deckTitle = deckForAll["deckTitle"] as String,
+////                            cardList = deckForAll["cardList"] as List<Card>,
+////                            bookmarked = deckForUser["bookmarked"] as Boolean,
+////                            shared = deckForAll["shared"] as Boolean,
+////                            key = key
+////                        )
+////                    )
+////                }
+////
+////            }
+//////
+////        }
+//
+//    }
 }
