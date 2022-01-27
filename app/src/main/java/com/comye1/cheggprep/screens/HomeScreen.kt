@@ -17,10 +17,7 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -74,56 +71,57 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
             /*
             key 역순으로 (최신순) 정렬
              */
-            viewModel.myDeckList.sortedByDescending { it.key }.let { list ->
-                when (selectedFilterIndex) {
-                    0 ->
-                        list.forEach {
-                            item(key = it.key) {
-                                DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
-                                {
-                                    navController.navigate(
-                                        Screen.Deck.route + "/${it.key}"
-                                    )
+            if (viewModel.user!= null){
+                viewModel.myDeckList.sortedByDescending { it.key }.let { list ->
+                    when (selectedFilterIndex) {
+                        0 ->
+                            list.forEach {
+                                item {
+                                    DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
+                                    {
+                                        navController.navigate(
+                                            Screen.Deck.route + "/${it.key}"
+                                        )
+                                    }
+                                }
+
+                            }
+                        1 ->
+                            list.filter { it.bookmarked }.forEach {
+                                item {
+                                    DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
+                                    {
+                                        navController.navigate(
+                                            Screen.Deck.route + "/${it.key}"
+                                        )
+                                    }
                                 }
                             }
 
-                        }
-                    1 ->
-                        list.filter { it.bookmarked }.forEach {
-                            item(key = it.key) {
-                                DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
-                                {
-                                    navController.navigate(
-                                        Screen.Deck.route + "/${it.key}"
-                                    )
+                        2 ->
+                            list.filter { it.deckType == DECK_CREATED }.forEach {
+                                item {
+                                    DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
+                                    {
+                                        navController.navigate(
+                                            Screen.Deck.route + "/${it.key}"
+                                        )
+                                    }
                                 }
                             }
-                        }
+                    }
 
-                    2 ->
-                        list.filter { it.deckType == DECK_CREATED }.forEach {
-                            item(key = it.key) {
-                                DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
-                                {
-                                    navController.navigate(
-                                        Screen.Deck.route + "/${it.key}"
-                                    )
-                                }
-                            }
-                        }
                 }
-
-            }
-            item { MakeMyDeck(onClick = { navController.navigate(Screen.Create.route) }) }
-            item {
-                Spacer(modifier = Modifier.height(50.dp))
-            }
-
-            /*
-            스크롤을 맨 위로
-             */
-            scope.launch {
-                lazyListState.scrollToItem(0)
+                item { MakeMyDeck(onClick = { navController.navigate(Screen.Create.route) }) }
+                item {
+                    Spacer(modifier = Modifier.height(50.dp))
+                }
+                /*
+                스크롤을 맨 위로
+                 */
+                scope.launch {
+                    lazyListState.scrollToItem(0)
+                }
             }
         }
     }

@@ -19,62 +19,62 @@ class HomeViewModel : ViewModel() {
     var myDeckList = mutableStateListOf<Deck>()
         private set
 
-    companion object {
-        /*
-        가져온다..!
-         */
-        val database = Firebase.database.reference
-        val user = FirebaseAuth.getInstance().currentUser!!
-
-    }
+    /*
+    가져온다..!
+     */
+    val database = Firebase.database.reference
+    val user
+        get() = FirebaseAuth.getInstance().currentUser
 
     private fun getUserDecks() {
         /*
         User안에 있는 Deck들 가져오기... 이제 업뎃도 해야 한다
          */
-        database.child("user/${user.uid}/decks").addValueEventListener(
-            object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.value != null) {
-                        val deckForUserList = snapshot.value as HashMap<String, DeckForUser>
+        user?.let {
+            database.child("user/${user!!.uid}/decks").addValueEventListener(
+                object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.value != null) {
+                            val deckForUserList = snapshot.value as HashMap<String, DeckForUser>
 
-                        deckForUserList.keys.sorted().forEach { key ->
-                            // it.value는 DeckForAll
-                            val deckForUser = deckForUserList[key] as HashMap<*, *>
+                            deckForUserList.keys.sorted().forEach { key ->
+                                // it.value는 DeckForAll
+                                val deckForUser = deckForUserList[key] as HashMap<*, *>
 
-                            myDeckList.clear() // myDeckList를 비우고 데이터를 새로 받아옴
+                                myDeckList.clear() // myDeckList를 비우고 데이터를 새로 받아옴
 
-                            database.child("all/decks/$key").get().addOnSuccessListener { all ->
-                                // all.value는 DeckForUser
-                                val deckForAll = all.value as HashMap<*, *>
+                                database.child("all/decks/$key").get().addOnSuccessListener { all ->
+                                    // all.value는 DeckForUser
+                                    val deckForAll = all.value as HashMap<*, *>
 
-                                // 사용자의 Deck 이거나 (deckType == 0)
-                                // 다른 사용자의 Deck 이면서 공유된 것 (shared == true)
-                                val deckType = (deckForUser["deckType"] as Long).toInt()
-                                val shared = deckForAll["shared"] as Boolean
+                                    // 사용자의 Deck 이거나 (deckType == 0)
+                                    // 다른 사용자의 Deck 이면서 공유된 것 (shared == true)
+                                    val deckType = (deckForUser["deckType"] as Long).toInt()
+                                    val shared = deckForAll["shared"] as Boolean
 
-                                if (deckType == DECK_CREATED || shared) {
-                                    myDeckList.add(
-                                        Deck(
-                                            deckType = deckType,
-                                            deckTitle = deckForAll["deckTitle"] as String,
-                                            cardList = deckForAll["cardList"] as List<Card>,
-                                            bookmarked = deckForUser["bookmarked"] as Boolean,
-                                            shared = shared,
-                                            key = key
+                                    if (deckType == DECK_CREATED || shared) {
+                                        myDeckList.add(
+                                            Deck(
+                                                deckType = deckType,
+                                                deckTitle = deckForAll["deckTitle"] as String,
+                                                cardList = deckForAll["cardList"] as List<Card>,
+                                                bookmarked = deckForUser["bookmarked"] as Boolean,
+                                                shared = shared,
+                                                key = key
+                                            )
                                         )
-                                    )
-                                    Log.d("myDeckList", myDeckList.last().toString())
+                                        Log.d("myDeckList", myDeckList.last().toString())
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                override fun onCancelled(error: DatabaseError) {
+                    override fun onCancelled(error: DatabaseError) {
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 
     init {
