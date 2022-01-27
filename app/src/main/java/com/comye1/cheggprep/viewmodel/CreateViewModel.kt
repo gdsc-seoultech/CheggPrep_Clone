@@ -13,26 +13,40 @@ import com.google.firebase.ktx.Firebase
 class CreateViewModel : ViewModel() {
 
     private val database = Firebase.database.reference
-    private val user = FirebaseAuth.getInstance().currentUser!!
+    private val user = FirebaseAuth.getInstance().currentUser
 
     /*
     RDB에 새로운 Deck 생성 - All 및 User에 저장해야 함.
     */
     fun writeNewDeck(deck: Deck): String {
-        val key = database.child("all/decks").push().key ?: ""
-        val deckForAll =
-            DeckForAll(deckTitle = deck.deckTitle, shared = deck.shared, cardList = deck.cardList)
-        val deckForUser = DeckForUser(deckType = deck.deckType, bookmarked = deck.bookmarked)
-        database.child("all/decks").child(key.toString()).setValue(deckForAll)
-            .addOnCompleteListener {
-                Log.d("firebase", "success")
-            }
-        database.child("user/${user.uid}/decks").child(key.toString()).setValue(deckForUser)
-            .addOnCompleteListener {
-                Log.d("firebase", "success")
-            }
-        // TODO 실패 처리 어떻게 하냐..
-        return key
+        user?.let {
+            val key = database.child("all/decks").push().key ?: ""
+            val deckForAll =
+                DeckForAll(
+                    deckTitle = deck.deckTitle,
+                    shared = deck.shared,
+                    cardList = deck.cardList
+                )
+            val deckForUser = DeckForUser(
+                deckType = deck.deckType,
+                bookmarked = deck.bookmarked
+            )
+            database.child("all/decks")
+                .child(key)
+                .setValue(deckForAll)
+                .addOnCompleteListener {
+                    Log.d("firebase", "success")
+                }
+            database.child("user/${user.uid}/decks")
+                .child(key)
+                .setValue(deckForUser)
+                .addOnCompleteListener {
+                    Log.d("firebase", "success")
+                }
+            // TODO 실패 처리 어떻게 하냐..
+            return key
+        }
+        return "LOGIN_NEEDED"
     }
 
     // CreateScreen /////////////////
