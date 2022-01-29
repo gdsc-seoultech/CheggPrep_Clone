@@ -36,6 +36,51 @@ fun DeckScreen(navController: NavController, key: String) {
     val database = Firebase.database.reference
     val user = FirebaseAuth.getInstance().currentUser!!
 
+    val addBookmark: () -> Unit = {
+        if (!user.isAnonymous) {
+            deck?.apply {
+                if (deckType != DECK_ADDED) // 학습 내역이 없음
+                    deckType = DECK_ONLY_BOOKMARKED // only 북마크만!
+            }
+            // deck 속성을 변경하지 말고 새로운 deck를 인가해줘야 한다!
+            deck = deck?.copy(bookmarked = true)
+            deck?.also {
+                val deckForUser = DeckForUser(deckType = it.deckType, bookmarked = true)
+                database.child("user/${user.uid}/decks/$key")
+                    .setValue(deckForUser)
+                    .addOnSuccessListener {
+                        Log.d("firebase bookmarked", deck.toString())
+                    }
+
+            }
+        }
+    }
+
+    val deleteBookmark: () -> Unit = {
+        if (!user.isAnonymous) {
+            when (deck?.deckType) {
+                DECK_ADDED -> { // 북마크만 false로 변경
+                    deck = deck?.copy(bookmarked = false)
+                    // deck 속성을 변경하지 말고 새로운 deck를 인가해줘야 한다!
+                    database.child("user/${user.uid}/decks/$key")
+                        .setValue(
+                            deck
+                        ).addOnSuccessListener {
+                            Log.d("firebase bookmarked", deck.toString())
+                        }
+                }
+                DECK_ONLY_BOOKMARKED -> { // 사용자 decks에서 제거
+                    database.child("user/${user.uid}/decks/$key")
+                        .removeValue()
+                        .addOnSuccessListener {
+                            Log.d("firebase unbookmark", deck.toString())
+                        }
+                }
+            }
+
+        }
+    }
+
     database.child("all/decks/$key").get().addOnSuccessListener { all ->
 
         val deckForAll = all.getValue(DeckForAll::class.java)
@@ -62,7 +107,7 @@ fun DeckScreen(navController: NavController, key: String) {
         if (deckForAll != null && deckForUser == null) {
             deck = Deck(
                 deckTitle = deckForAll.deckTitle,
-                deckType = -1,
+                deckType = -1, // 사용자의 Deck도 아니고 추가된 Deck도 아님
                 cardList = deckForAll.cardList,
                 bookmarked = false,
                 shared = deckForAll.shared,
@@ -98,14 +143,17 @@ fun DeckScreen(navController: NavController, key: String) {
                         }
                     } else {
                         if (deck.bookmarked) {
-                            IconButton(onClick = { /*TODO*/ }) {
+                            IconButton(onClick = {
+                                deleteBookmark()
+                                Log.d("log deck", deck.deckType.toString())
+                            }) {
                                 Icon(
                                     imageVector = Icons.Default.Bookmark,
                                     contentDescription = "add bookmark"
                                 )
                             }
                         } else {
-                            IconButton(onClick = { /*TODO*/ }) {
+                            IconButton(onClick = addBookmark) {
                                 Icon(
                                     imageVector = Icons.Default.BookmarkBorder,
                                     contentDescription = "add bookmark"
@@ -184,6 +232,3 @@ fun CardItem(card: Card) {
         )
     }
 }
-
-//fun getDeckByKey(key: String): Deck? {
-//}
