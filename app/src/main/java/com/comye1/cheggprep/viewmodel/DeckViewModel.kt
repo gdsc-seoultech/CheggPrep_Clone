@@ -5,56 +5,58 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.comye1.cheggprep.models.*
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
-class DeckViewModel: ViewModel() {
+class DeckViewModel : ViewModel() {
 
-    val deck = mutableStateOf<Deck?>(null)
+    var deck = mutableStateOf<Deck?>(null)
+
     /*
     전달받은 key로 deck 가져오기
      */
     val database = Firebase.database.reference
     val user = FirebaseAuth.getInstance().currentUser!!
 
-    fun getDeckByKey(key: String): Unit {
-        database.child("all/decks/$key").get().addOnSuccessListener { all ->
-            Log.d("deck all", all.toString())
-            val deckForAll = all.getValue(DeckForAll::class.java)
-            var deckForUser: DeckForUser? = null
+    fun getDeckByKey(key: String) {
+        database.child("all/decks/$key").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val deckForAll = snapshot.getValue(DeckForAll::class.java)
+                var deckForUser: DeckForUser?
+                Log.d("firebase all", deckForAll.toString())
+                database.child("user/${user.uid}/decks/$key")
+                    .addValueEventListener(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            deckForUser = snapshot.getValue(DeckForUser::class.java)
+                            Log.d("firebase user", deckForUser.toString())
+                            if (deckForAll != null && deckForUser != null) {
+                                deck.value = Deck(
+                                    deckTitle = deckForAll.deckTitle,
+                                    deckType = deckForUser!!.deckType,
+                                    cardList = deckForAll.cardList,
+                                    bookmarked = deckForUser!!.bookmarked,
+                                    shared = deckForAll.shared,
+                                    key = key
+                                )
+                            }
+                        }
 
-            database.child("user/${user.uid}/decks/$key").get().addOnSuccessListener { user ->
-
-                Log.d("deck user", user.toString())
-
-                deckForUser = user.getValue(DeckForUser::class.java)
-
-                if (deckForAll != null && deckForUser != null) {
-                    deck.value = Deck(
-                        deckTitle = deckForAll.deckTitle,
-                        deckType = deckForUser!!.deckType,
-                        cardList = deckForAll.cardList,
-                        bookmarked = deckForUser!!.bookmarked,
-                        shared = deckForAll.shared,
-                        key = key
-                    )
-                }
+                        override fun onCancelled(error: DatabaseError) {
+                            TODO("Not yet implemented")
+                        }
+                    })
             }
 
-            if (deckForAll != null && deckForUser == null) {
-                deck.value = Deck(
-                    deckTitle = deckForAll.deckTitle,
-                    deckType = -1, // 사용자의 Deck도 아니고 추가된 Deck도 아님
-                    cardList = deckForAll.cardList,
-                    bookmarked = false,
-                    shared = deckForAll.shared,
-                    key = key
-                )
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
             }
-        }
+        })
     }
 
-    fun addBookmark(key: String): Unit{
+    fun addBookmark(key: String): Unit {
         if (!user.isAnonymous) {
             deck.value?.apply {
                 if (deckType != DECK_ADDED) // 학습 내역이 없음
@@ -98,6 +100,7 @@ class DeckViewModel: ViewModel() {
         }
     }
 }
+
 
 //class DeckViewModelFactory(
 //    private val key: String
