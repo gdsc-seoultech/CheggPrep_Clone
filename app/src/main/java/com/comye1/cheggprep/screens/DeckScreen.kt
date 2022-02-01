@@ -8,7 +8,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +35,10 @@ fun DeckScreen(navController: NavController, key: String) {
         viewModel.deck
     }
 
+    val (userMenuExpanded, setUserMenuExpanded) = remember {
+        mutableStateOf(false)
+    }
+
     deck?.let { deck ->
         Scaffold(topBar = {
             TopAppBar(
@@ -51,12 +58,18 @@ fun DeckScreen(navController: NavController, key: String) {
                         Icon(imageVector = Icons.Default.Share, contentDescription = "share")
                     }
                     if (deck.deckType == DECK_CREATED) {
-                        IconButton(onClick = { /*TODO*/ }) {
+
+                        IconButton(onClick = { setUserMenuExpanded(true) }) {
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
                                 contentDescription = "more"
                             )
                         }
+
+                        UserDeckMenu(expanded = userMenuExpanded) {
+                            setUserMenuExpanded(false)
+                        }
+
                     } else {
                         if (deck.bookmarked) {
                             IconButton(onClick = { viewModel.deleteBookmark(key = key) }) {
@@ -118,6 +131,42 @@ fun DeckScreen(navController: NavController, key: String) {
         }
     }
 
+}
+
+@Composable
+fun UserDeckMenu(expanded: Boolean, dismiss: () -> Unit) {
+    DropdownMenu(expanded = expanded, onDismissRequest = { dismiss() }, modifier = Modifier.width(180.dp)) {
+        DropdownMenuItem(
+            onClick = {
+
+                dismiss()
+            }
+        ) {
+            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = "Edit deck details")
+        }
+        DropdownMenuItem(
+            onClick = {
+
+                dismiss()
+            }
+        ) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = "Edit")
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = "Add card")
+        }
+        DropdownMenuItem(
+            onClick = {
+
+                dismiss()
+            }
+        ) {
+            Icon(imageVector = Icons.Default.Delete, contentDescription = "Edit")
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = "Delete")
+        }
+    }
 }
 
 @Composable
