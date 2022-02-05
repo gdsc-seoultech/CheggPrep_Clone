@@ -1,6 +1,6 @@
 package com.comye1.cheggprep.screens
 
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,10 +17,14 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -38,6 +42,7 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
         mutableStateOf(0)
     }
 
+    val context = LocalContext.current
     val lazyListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
@@ -70,7 +75,7 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
             /*
             key 역순으로 (최신순) 정렬
              */
-            if (viewModel.user!= null){
+            if (viewModel.user != null) {
                 viewModel.myDeckList.sortedByDescending { it.key }.let { list ->
                     when (selectedFilterIndex) {
                         0 ->
@@ -109,18 +114,31 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
                                 }
                             }
                     }
-
+                    item {
+                        MakeMyDeck(onClick = { navController.navigate(Screen.Create.route) })
+                    }
+                    item {
+                        Spacer(modifier = Modifier.height(50.dp))
+                    }
+                    /*
+                   스크롤을 맨 위로
+                    */
+                    scope.launch {
+                        lazyListState.scrollToItem(0)
+                    }
                 }
-                item { MakeMyDeck(onClick = { navController.navigate(Screen.Create.route) }) }
+            } else {
                 item {
-                    Spacer(modifier = Modifier.height(50.dp))
+                    MakeMyDeck(onClick = {
+                        navController.navigate(Screen.More.route)
+                        Toast.makeText(
+                            context,
+                            "You need to sign in to create a card.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    })
                 }
-                /*
-                스크롤을 맨 위로
-                 */
-                scope.launch {
-                    lazyListState.scrollToItem(0)
-                }
+
             }
         }
     }

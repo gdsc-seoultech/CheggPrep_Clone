@@ -83,8 +83,4 @@ class HomeViewModel : ViewModel() {
     fun refresh() {
         getUserDecks()
     }
-
-    init {
-        getUserDecks()
-    }
 }
