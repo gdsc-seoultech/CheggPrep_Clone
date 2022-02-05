@@ -8,9 +8,8 @@ import com.comye1.cheggprep.models.DECK_CREATED
 import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.models.DeckForUser
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
@@ -22,11 +21,13 @@ class HomeViewModel : ViewModel() {
     /*
     가져온다..!
      */
-    val database = Firebase.database.reference
-    val user
-        get() = FirebaseAuth.getInstance().currentUser
+    lateinit var database: DatabaseReference
+    var user: FirebaseUser? = null
 
     private fun getUserDecks() {
+
+        database = Firebase.database.reference
+        user = FirebaseAuth.getInstance().currentUser
         /*
         User안에 있는 Deck들 가져오기... 이제 업뎃도 해야 한다
          */
@@ -71,10 +72,16 @@ class HomeViewModel : ViewModel() {
                     }
 
                     override fun onCancelled(error: DatabaseError) {
+                        Log.d("homescreen", "canceled")
+                        myDeckList.clear()
                     }
                 }
             )
         }
+    }
+
+    fun refresh() {
+        getUserDecks()
     }
 
     init {

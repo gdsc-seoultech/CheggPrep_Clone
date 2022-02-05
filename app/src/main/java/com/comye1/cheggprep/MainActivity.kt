@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -36,6 +37,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.flow.collect
 
 // TODO : BottomNavigationBar scale / popUpTo 옵션 지정
 
@@ -70,6 +72,23 @@ class MainActivity : ComponentActivity() {
                 }
 
                 val firebaseAuth = moreViewModel.firebaseAuth.collectAsState()
+                /*
+                event flow를 보내서 signIn / signOut을 전달받고
+                각 viewModel의 함수를 호출해서 새롭게 로드할 수 있을까?!
+                 */
+                lifecycleScope.launchWhenCreated {
+                    moreViewModel.userEvent.collect { event ->
+                        when(event) {
+                            MoreViewModel.Companion.UserEvent.SignIn -> {
+                                homeViewModel.refresh()
+                            }
+                            MoreViewModel.Companion.UserEvent.SignOut -> {
+                                homeViewModel.refresh()
+                            }
+                        }
+                    }
+                }
+
 
                 if (firebaseAuth.value) { // firebaseAuth가 true일 때
                     firebaseAuthWithGoogle(moreViewModel.token.value, moreViewModel::signIn)

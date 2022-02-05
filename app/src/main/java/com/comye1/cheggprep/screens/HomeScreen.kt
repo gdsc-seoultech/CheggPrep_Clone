@@ -67,7 +67,6 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
 //            reverseLayout = true, // 최신 Deck를 위로
             state = lazyListState
         ) {
-            Log.d("homescreen", viewModel.myDeckList.joinToString("//"))
             /*
             key 역순으로 (최신순) 정렬
              */
