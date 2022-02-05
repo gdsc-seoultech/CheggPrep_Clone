@@ -53,6 +53,7 @@ fun SignInScreen(viewModel: MoreViewModel) {
     })
     user?.let {
         viewModel.toMainScreen() // Flow를 통해 user가 전달되면 MainScreen으로 이동
+        // TODO 새로 로드하기,,, 어떢하죠
     }
 }
 
@@ -93,7 +94,10 @@ fun GoogleSignInButtonUi(
     }
 
     Surface(
-        onClick = { clicked = !clicked },
+        onClick = {
+            onClicked()
+            clicked = false
+        },
         shape = MaterialTheme.shapes.medium,
         border = BorderStroke(width = 1.dp, color = Color.LightGray),
         color = MaterialTheme.colors.surface
@@ -132,7 +136,6 @@ fun GoogleSignInButtonUi(
                     strokeWidth = 2.dp,
                     color = MaterialTheme.colors.primary
                 )
-                onClicked()
                 // authResultLauncer launch : SignIn Intent 실행 및 결과 처리 (AuthResultContract)
             }
         }
