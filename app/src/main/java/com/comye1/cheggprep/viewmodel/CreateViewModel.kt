@@ -12,13 +12,13 @@ import com.google.firebase.ktx.Firebase
 
 class CreateViewModel : ViewModel() {
 
-    private val database = Firebase.database.reference
-    private val user = FirebaseAuth.getInstance().currentUser
-
     /*
     RDB에 새로운 Deck 생성 - All 및 User에 저장해야 함.
     */
     fun writeNewDeck(deck: Deck): String {
+        val database = Firebase.database.reference
+        val user = FirebaseAuth.getInstance().currentUser
+
         user?.let {
             val key = database.child("all/decks").push().key ?: ""
             val deckForAll =
