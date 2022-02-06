@@ -46,29 +46,28 @@ class DeckViewModel : ViewModel() {
                                     key = key
                                 )
                             }
+                            if (deckForAll != null && deckForUser == null) { // user에 존재하지 않음
+                                deck.value = Deck(
+                                    deckTitle = deckForAll!!.deckTitle,
+                                    deckType = -1, // 사용자의 Deck도 아니고 추가된 Deck도 아님
+                                    cardList = deckForAll!!.cardList,
+                                    bookmarked = false,
+                                    shared = deckForAll!!.shared,
+                                    key = key
+                                )
+                            }
                         }
 
                         override fun onCancelled(error: DatabaseError) {
-                            deck.value = null
+
                         }
                     })
-
             }
 
             override fun onCancelled(error: DatabaseError) {
                 deck.value = null
             }
         })
-        if (deckForAll != null && deckForUser == null) { // user에 존재하지 않음
-            deck.value = Deck(
-                deckTitle = deckForAll!!.deckTitle,
-                deckType = -1, // 사용자의 Deck도 아니고 추가된 Deck도 아님
-                cardList = deckForAll!!.cardList,
-                bookmarked = false,
-                shared = deckForAll!!.shared,
-                key = key
-            )
-        }
     }
 
     fun addBookmark(key: String): Unit {
