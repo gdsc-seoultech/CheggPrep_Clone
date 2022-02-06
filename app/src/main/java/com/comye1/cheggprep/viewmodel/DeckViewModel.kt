@@ -15,18 +15,21 @@ class DeckViewModel : ViewModel() {
 
     var deck = mutableStateOf<Deck?>(null)
 
+    val database = Firebase.database.reference
+    val user = FirebaseAuth.getInstance().currentUser!!
+
     /*
     전달받은 key로 deck 가져오기
      */
     fun getDeckByKey(key: String) {
 
-        val database = Firebase.database.reference
-        val user = FirebaseAuth.getInstance().currentUser!!
+        var deckForAll: DeckForAll? = null
+        var deckForUser: DeckForUser? = null
 
         database.child("all/decks/$key").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val deckForAll = snapshot.getValue(DeckForAll::class.java)
-                var deckForUser: DeckForUser? = null
+                deckForAll = snapshot.getValue(DeckForAll::class.java)
+
                 Log.d("firebase all", deckForAll.toString())
                 database.child("user/${user.uid}/decks/$key")
                     .addValueEventListener(object : ValueEventListener {
@@ -35,11 +38,11 @@ class DeckViewModel : ViewModel() {
                             Log.d("firebase user", deckForUser.toString())
                             if (deckForAll != null && deckForUser != null) {
                                 deck.value = Deck(
-                                    deckTitle = deckForAll.deckTitle,
+                                    deckTitle = deckForAll!!.deckTitle,
                                     deckType = deckForUser!!.deckType,
-                                    cardList = deckForAll.cardList,
+                                    cardList = deckForAll!!.cardList,
                                     bookmarked = deckForUser!!.bookmarked,
-                                    shared = deckForAll.shared,
+                                    shared = deckForAll!!.shared,
                                     key = key
                                 )
                             }
@@ -50,22 +53,22 @@ class DeckViewModel : ViewModel() {
                         }
                     })
 
-                if (deckForAll != null && deckForUser == null) { // user에 존재하지 않음
-                    deck.value = Deck(
-                        deckTitle = deckForAll.deckTitle,
-                        deckType = -1, // 사용자의 Deck도 아니고 추가된 Deck도 아님
-                        cardList = deckForAll.cardList,
-                        bookmarked = false,
-                        shared = deckForAll.shared,
-                        key = key
-                    )
-                }
             }
 
             override fun onCancelled(error: DatabaseError) {
                 deck.value = null
             }
         })
+        if (deckForAll != null && deckForUser == null) { // user에 존재하지 않음
+            deck.value = Deck(
+                deckTitle = deckForAll!!.deckTitle,
+                deckType = -1, // 사용자의 Deck도 아니고 추가된 Deck도 아님
+                cardList = deckForAll!!.cardList,
+                bookmarked = false,
+                shared = deckForAll!!.shared,
+                key = key
+            )
+        }
     }
 
     fun addBookmark(key: String): Unit {
