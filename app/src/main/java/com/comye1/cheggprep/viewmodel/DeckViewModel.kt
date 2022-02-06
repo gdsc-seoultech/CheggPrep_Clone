@@ -18,14 +18,15 @@ class DeckViewModel : ViewModel() {
     /*
     전달받은 key로 deck 가져오기
      */
-    val database = Firebase.database.reference
-    val user = FirebaseAuth.getInstance().currentUser!!
-
     fun getDeckByKey(key: String) {
+
+        val database = Firebase.database.reference
+        val user = FirebaseAuth.getInstance().currentUser!!
+
         database.child("all/decks/$key").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val deckForAll = snapshot.getValue(DeckForAll::class.java)
-                var deckForUser: DeckForUser?
+                var deckForUser: DeckForUser? = null
                 Log.d("firebase all", deckForAll.toString())
                 database.child("user/${user.uid}/decks/$key")
                     .addValueEventListener(object : ValueEventListener {
@@ -45,18 +46,33 @@ class DeckViewModel : ViewModel() {
                         }
 
                         override fun onCancelled(error: DatabaseError) {
-                            TODO("Not yet implemented")
+                            deck.value = null
                         }
                     })
+
+                if (deckForAll != null && deckForUser == null) { // user에 존재하지 않음
+                    deck.value = Deck(
+                        deckTitle = deckForAll.deckTitle,
+                        deckType = -1, // 사용자의 Deck도 아니고 추가된 Deck도 아님
+                        cardList = deckForAll.cardList,
+                        bookmarked = false,
+                        shared = deckForAll.shared,
+                        key = key
+                    )
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                deck.value = null
             }
         })
     }
 
     fun addBookmark(key: String): Unit {
+
+        val database = Firebase.database.reference
+        val user = FirebaseAuth.getInstance().currentUser!!
+
         if (!user.isAnonymous) {
             deck.value?.apply {
                 if (deckType != DECK_ADDED) // 학습 내역이 없음
@@ -77,6 +93,10 @@ class DeckViewModel : ViewModel() {
     }
 
     fun deleteBookmark(key: String): Unit {
+
+        val database = Firebase.database.reference
+        val user = FirebaseAuth.getInstance().currentUser!!
+
         if (!user.isAnonymous) {
             when (deck.value?.deckType) {
                 DECK_ADDED -> { // 북마크만 false로 변경
