@@ -8,10 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,6 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.comye1.cheggprep.models.Card
 import com.comye1.cheggprep.models.DECK_CREATED
+import com.comye1.cheggprep.models.DECK_ONLY_BOOKMARKED
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.viewmodel.DeckViewModel
 
@@ -29,7 +27,10 @@ import com.comye1.cheggprep.viewmodel.DeckViewModel
 fun DeckScreen(navController: NavController, key: String) {
 
     val viewModel: DeckViewModel = viewModel()
-    viewModel.getDeckByKey(key)
+
+    LaunchedEffect(key1 = true) {
+        viewModel.getDeckByKey(key)
+    }
 
     val deck by remember {
         viewModel.deck
@@ -57,28 +58,29 @@ fun DeckScreen(navController: NavController, key: String) {
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(imageVector = Icons.Default.Share, contentDescription = "share")
                     }
-                    if (deck.deckType == DECK_CREATED) {
+                    when (deck.deckType) {
+                        DECK_CREATED -> {
+                            IconButton(onClick = { setUserMenuExpanded(true) }) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "more"
+                                )
+                            }
 
-                        IconButton(onClick = { setUserMenuExpanded(true) }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = "more"
+                            UserDeckMenu(expanded = userMenuExpanded, dismiss = {
+                                setUserMenuExpanded(false)
+                            }
                             )
                         }
-
-                        UserDeckMenu(expanded = userMenuExpanded) {
-                            setUserMenuExpanded(false)
-                        }
-
-                    } else {
-                        if (deck.bookmarked) {
+                        DECK_ONLY_BOOKMARKED -> {
                             IconButton(onClick = { viewModel.deleteBookmark(key = key) }) {
                                 Icon(
                                     imageVector = Icons.Default.Bookmark,
                                     contentDescription = "add bookmark"
                                 )
                             }
-                        } else {
+                        }
+                        else -> {
                             IconButton(onClick = { viewModel.addBookmark(key = key) }) {
                                 Icon(
                                     imageVector = Icons.Default.BookmarkBorder,
@@ -135,10 +137,18 @@ fun DeckScreen(navController: NavController, key: String) {
 
 @Composable
 fun UserDeckMenu(expanded: Boolean, dismiss: () -> Unit) {
-    DropdownMenu(expanded = expanded, onDismissRequest = { dismiss() }, modifier = Modifier.width(180.dp)) {
+    /*
+    Edit -> title, visibility 수정, Done 버튼
+    Add -> card 추가
+    Delete -> dialog -> HomeScreen
+     */
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { dismiss() },
+        modifier = Modifier.width(180.dp)
+    ) {
         DropdownMenuItem(
             onClick = {
-
                 dismiss()
             }
         ) {
