@@ -6,7 +6,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -19,8 +18,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -30,21 +28,19 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.comye1.cheggprep.models.DECK_ADDED
 import com.comye1.cheggprep.models.DECK_CREATED
+import com.comye1.cheggprep.models.DECK_ONLY_BOOKMARKED
 import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.viewmodel.HomeViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
-    var (selectedFilterIndex, setFilterIndex) = remember {
+    var (selectedFilterIndex, setFilterIndex) = rememberSaveable { // Deck 상세화면 이동 후에도 유지
         mutableStateOf(0)
     }
 
     val context = LocalContext.current
-    val lazyListState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -69,8 +65,6 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
     ) {
         LazyColumn(
             modifier = Modifier.padding(16.dp),
-//            reverseLayout = true, // 최신 Deck를 위로
-            state = lazyListState
         ) {
             /*
             key 역순으로 (최신순) 정렬
@@ -119,12 +113,6 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
                     }
                     item {
                         Spacer(modifier = Modifier.height(50.dp))
-                    }
-                    /*
-                   스크롤을 맨 위로
-                    */
-                    scope.launch {
-                        lazyListState.scrollToItem(0)
                     }
                 }
             } else {
@@ -254,6 +242,13 @@ fun DeckItem(deck: Deck, modifier: Modifier = Modifier, onClick: () -> Unit) {
                             tint = Color.Gray
                         )
                     }
+                }
+                DECK_ONLY_BOOKMARKED -> {
+                    Icon(
+                        imageVector = Icons.Default.Bookmark,
+                        contentDescription = "bookmark",
+                        tint = Color.Gray
+                    )
                 }
                 DECK_ADDED -> {
                     if (deck.bookmarked) {
