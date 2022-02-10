@@ -10,11 +10,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,7 +26,6 @@ import androidx.navigation.NavHostController
 import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.ui.theme.DeepOrange
-import com.comye1.cheggprep.viewmodel.MoreViewModel
 import com.comye1.cheggprep.viewmodel.SearchState
 import com.comye1.cheggprep.viewmodel.SearchViewModel
 
@@ -37,9 +36,9 @@ fun SearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
     when (viewModel.searchScreenState.value) {
         SearchState.ButtonScreen -> {
             SearchButtonScreen {
-                if(viewModel.queryString.value.isNotBlank()){
+                if (viewModel.queryString.value.isNotBlank()) {
                     viewModel.toResultScreen()
-                }else {
+                } else {
                     viewModel.toQueryScreen()
                 }
             }
@@ -49,14 +48,16 @@ fun SearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
                 queryString = viewModel.queryString.value,
                 setQueryString = viewModel::setQueryString,
                 toButtonScreen = viewModel::toButtonScreen,
-                toResultScreen = viewModel::toResultScreen
+                toResultScreen = viewModel::toResultScreen,
+                getAllDecks = viewModel::getAllDecks,   // 검색 요청 시 호출
             )
         }
         SearchState.ResultScreen -> {
             SearchResultScreen(
                 queryString = viewModel.queryString.value,
+                queryResult = viewModel.queryResult,    // 검색 결과에 따라 recomposition
+                updateResult = viewModel::getAllDecks,  // 재 검색 요청 시 호출
                 setQueryString = viewModel::setQueryString,
-                getQueryResult = viewModel::getQueryResult,
                 toButtonScreen = viewModel::toButtonScreen,
                 toDeckScreen = {
                     navController.navigate(
@@ -71,15 +72,12 @@ fun SearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
 @Composable
 fun SearchResultScreen(
     queryString: String,
+    queryResult: List<Deck>,
+    updateResult: () -> Unit,
     setQueryString: (String) -> Unit,
-    getQueryResult: () -> List<Deck>,
     toButtonScreen: () -> Unit,
     toDeckScreen: (Deck) -> Unit
 ) {
-
-    val (queryResult, setQueryResult) = remember {
-        mutableStateOf(getQueryResult())
-    }
 
     Scaffold(
         topBar = {
@@ -87,17 +85,16 @@ fun SearchResultScreen(
                 queryString = queryString,
                 setQueryString = setQueryString,
                 onBackButtonClick = toButtonScreen,
-                onSearchKey = {
-                    setQueryResult(getQueryResult())
-                }/*Todo 검색 결과 업데이트*/
+                onSearchKey = updateResult /*검색 결과 업데이트*/
             )
         }
     ) {
         LazyColumn(
             Modifier
                 .fillMaxSize()
-                .padding(16.dp)){
-            queryResult.forEach{
+                .padding(16.dp)
+        ) {
+            queryResult.forEach {
                 item {
                     DeckInResult(
                         deck = it,
@@ -156,7 +153,8 @@ fun SearchQueryScreen(
     queryString: String,
     setQueryString: (String) -> Unit,
     toButtonScreen: () -> Unit,
-    toResultScreen: () -> Unit
+    toResultScreen: () -> Unit,
+    getAllDecks: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -164,7 +162,11 @@ fun SearchQueryScreen(
                 queryString = queryString,
                 setQueryString = setQueryString,
                 onBackButtonClick = toButtonScreen,
-                onSearchKey = toResultScreen
+                onSearchKey = {
+                    // 검색 요청 시 모든 Deck 새로 불러오고 ResultScreen으로 이동
+                    toResultScreen()
+                    getAllDecks()
+                }
             )
         }
     ) {
