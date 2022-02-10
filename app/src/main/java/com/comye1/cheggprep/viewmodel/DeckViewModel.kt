@@ -70,7 +70,20 @@ class DeckViewModel : ViewModel() {
         })
     }
 
-    fun addBookmark(key: String): Unit {
+    fun deleteDeck(key: String) {
+        deck.value?.let {
+            if (it.deckType == DECK_CREATED){
+                database.child("all/decks/$key").removeValue().addOnSuccessListener {
+                    Log.d("deck remove", "success")
+                }
+                database.child("user/${user.uid}/decks/$key").removeValue().addOnSuccessListener {
+                    Log.d("deck remove", "success")
+                }
+            }
+        }
+    }
+
+    fun addBookmark(key: String) {
 
         val database = Firebase.database.reference
         val user = FirebaseAuth.getInstance().currentUser!!
@@ -94,7 +107,7 @@ class DeckViewModel : ViewModel() {
         }
     }
 
-    fun deleteBookmark(key: String): Unit {
+    fun deleteBookmark(key: String) {
 
         val database = Firebase.database.reference
         val user = FirebaseAuth.getInstance().currentUser!!
@@ -122,12 +135,3 @@ class DeckViewModel : ViewModel() {
         }
     }
 }
-
-
-//class DeckViewModelFactory(
-//    private val key: String
-//) : ViewModelProvider.Factory {
-//    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-//        return DeckViewModel(key) as T
-//    }
-//}
