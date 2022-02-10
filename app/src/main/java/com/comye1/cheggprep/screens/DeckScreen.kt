@@ -15,12 +15,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.comye1.cheggprep.models.Card
 import com.comye1.cheggprep.models.DECK_CREATED
 import com.comye1.cheggprep.models.DECK_ONLY_BOOKMARKED
+import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.ui.theme.DeepOrange
+import com.comye1.cheggprep.ui.theme.Teal
 import com.comye1.cheggprep.viewmodel.DeckViewModel
 
 @Composable
@@ -67,9 +70,13 @@ fun DeckScreen(navController: NavController, key: String) {
                                 )
                             }
 
-                            UserDeckMenu(expanded = userMenuExpanded, dismiss = {
-                                setUserMenuExpanded(false)
-                            }
+                            UserDeckMenu(
+                                expanded = userMenuExpanded,
+                                dismiss = { setUserMenuExpanded(false) },
+                                delete = {
+                                    viewModel.deleteDeck(key)
+                                    navController.navigate(Screen.Home.route)
+                                }
                             )
                         }
                         DECK_ONLY_BOOKMARKED -> {
@@ -136,12 +143,15 @@ fun DeckScreen(navController: NavController, key: String) {
 }
 
 @Composable
-fun UserDeckMenu(expanded: Boolean, dismiss: () -> Unit) {
+fun UserDeckMenu(expanded: Boolean, dismiss: () -> Unit, delete: () -> Unit) {
     /*
     Edit -> title, visibility 수정, Done 버튼
     Add -> card 추가
     Delete -> dialog -> HomeScreen
      */
+    val showDeleteDialog = remember {
+        mutableStateOf(false)
+    }
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = { dismiss() },
@@ -168,13 +178,64 @@ fun UserDeckMenu(expanded: Boolean, dismiss: () -> Unit) {
         }
         DropdownMenuItem(
             onClick = {
-
-                dismiss()
+                /*
+                Dialog 띄워서 
+                 */
+                showDeleteDialog.value = true
+//                dismiss()
             }
         ) {
             Icon(imageVector = Icons.Default.Delete, contentDescription = "Edit")
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = "Delete")
+        }
+        if (showDeleteDialog.value) {
+            DeleteConfirmDialog(
+                cancel = { showDeleteDialog.value = false },
+                delete = { delete() }
+            )
+        }
+    }
+}
+
+@Composable
+fun DeleteConfirmDialog(cancel: () -> Unit, delete: () -> Unit) {
+    Dialog(onDismissRequest = { cancel() }) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Are you sure you want to delete this deck?",
+                style = MaterialTheme.typography.h6,
+                color = Color.Black,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Text(
+                    text = "Cancel",
+                    modifier = Modifier
+                        .clickable { cancel() }
+                        .padding(8.dp),
+                    color = Teal,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Delete",
+                    modifier = Modifier
+                        .clickable { delete() }
+                        .padding(8.dp),
+                    color = Teal,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
     }
 }
