@@ -10,18 +10,38 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class DeckViewModel : ViewModel() {
 
     var deck = mutableStateOf<Deck?>(null)
 
-    val database = Firebase.database.reference
-    val user = FirebaseAuth.getInstance().currentUser!!
+    private val _deckState = MutableStateFlow<DeckState>(DeckState.Loading)
+    val deckState: StateFlow<DeckState> = _deckState
+
+    sealed class DeckState {
+
+        // 로딩중 - 초기 상태
+         object Loading: DeckState()
+
+        // 삭제됨 - 북마크 한 Deck가 Owner에 의해 삭제됨
+        object Deleted : DeckState()
+
+        // 보이지 않음 - 북마크 하거나 Add 된 Deck가 Invisible 상태임 ==> 해당 없음
+        // object Invisible : DeckState()
+
+        // 유효함 - 자신의 Deck 또는 북마크/Add된 Deck가 Visible 상태임임
+        class Valid(val deck: Deck) : DeckState()
+    }
 
     /*
     전달받은 key로 deck 가져오기
      */
     fun getDeckByKey(key: String) {
+
+        val database = Firebase.database.reference
+        val user = FirebaseAuth.getInstance().currentUser!!
 
         var deckForAll: DeckForAll? = null
         var deckForUser: DeckForUser? = null
@@ -30,38 +50,53 @@ class DeckViewModel : ViewModel() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 deckForAll = snapshot.getValue(DeckForAll::class.java)
 
-                Log.d("firebase all", deckForAll.toString())
-                database.child("user/${user.uid}/decks/$key")
-                    .addValueEventListener(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            deckForUser = snapshot.getValue(DeckForUser::class.java)
-                            Log.d("firebase user", deckForUser.toString())
-                            if (deckForAll != null && deckForUser != null) {
-                                deck.value = Deck(
-                                    deckTitle = deckForAll!!.deckTitle,
-                                    deckType = deckForUser!!.deckType,
-                                    cardList = deckForAll!!.cardList,
-                                    bookmarked = deckForUser!!.bookmarked,
-                                    shared = deckForAll!!.shared,
-                                    key = key
-                                )
-                            }
-                            if (deckForAll != null && deckForUser == null) { // user에 존재하지 않음
-                                deck.value = Deck(
-                                    deckTitle = deckForAll!!.deckTitle,
-                                    deckType = -1, // 사용자의 Deck도 아니고 추가된 Deck도 아님
-                                    cardList = deckForAll!!.cardList,
-                                    bookmarked = false,
-                                    shared = deckForAll!!.shared,
-                                    key = key
-                                )
-                            }
-                        }
+                /*
+                all에 존재하지 않음 (북마크 해놓은 Deck가 삭제된 경우)
+                 */
+                if (deckForAll == null){
+                    _deckState.value = DeckState.Deleted
+                    Log.d("firebase deleted deck", "ok")
+                }else {
+                    database.child("user/${user.uid}/decks/$key")
+                        .addValueEventListener(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                deckForUser = snapshot.getValue(DeckForUser::class.java)
+                                Log.d("firebase user", deckForUser.toString())
 
-                        override fun onCancelled(error: DatabaseError) {
 
-                        }
-                    })
+                                if (deckForUser != null) {
+                                    deck.value = Deck(
+                                        deckTitle = deckForAll!!.deckTitle,
+                                        deckType = deckForUser!!.deckType,
+                                        cardList = deckForAll!!.cardList,
+                                        bookmarked = deckForUser!!.bookmarked,
+                                        shared = deckForAll!!.shared,
+                                        key = key
+                                    )
+                                    _deckState.value = DeckState.Valid(
+                                        deck.value!!
+                                    )
+                                }
+                                else { // user에 존재하지 않음
+                                    deck.value = Deck(
+                                        deckTitle = deckForAll!!.deckTitle,
+                                        deckType = -1, // 사용자의 Deck도 아니고 추가된 Deck도 아님
+                                        cardList = deckForAll!!.cardList,
+                                        bookmarked = false,
+                                        shared = deckForAll!!.shared,
+                                        key = key
+                                    )
+                                    _deckState.value = DeckState.Valid(
+                                        deck.value!!
+                                    )
+                                }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+
+                            }
+                        })
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -71,8 +106,11 @@ class DeckViewModel : ViewModel() {
     }
 
     fun deleteDeck(key: String) {
+        val database = Firebase.database.reference
+        val user = FirebaseAuth.getInstance().currentUser!!
+
         deck.value?.let {
-            if (it.deckType == DECK_CREATED){
+            if (it.deckType == DECK_CREATED) {
                 database.child("all/decks/$key").removeValue().addOnSuccessListener {
                     Log.d("deck remove", "success")
                 }
@@ -108,7 +146,6 @@ class DeckViewModel : ViewModel() {
     }
 
     fun deleteBookmark(key: String) {
-
         val database = Firebase.database.reference
         val user = FirebaseAuth.getInstance().currentUser!!
 
