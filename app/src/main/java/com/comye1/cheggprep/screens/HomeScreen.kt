@@ -32,6 +32,7 @@ import com.comye1.cheggprep.models.DECK_ONLY_BOOKMARKED
 import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.ui.theme.DeepOrange
+import com.comye1.cheggprep.ui.theme.Teal
 import com.comye1.cheggprep.viewmodel.HomeViewModel
 
 @Composable
@@ -186,13 +187,13 @@ fun MakeMyDeck(onClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Default.NoteAdd,
                 contentDescription = "bookmark",
-                tint = Color.Blue
+                tint = Teal
             )
             Text(
                 text = "Get started",
                 style = MaterialTheme.typography.subtitle1,
                 fontWeight = FontWeight.Bold,
-                color = Color.Blue
+                color = Teal
             )
         }
     }
