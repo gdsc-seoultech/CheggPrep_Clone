@@ -69,39 +69,57 @@ class DeckViewModel : ViewModel() {
                                     deckForUser = snapshot.getValue(DeckForUser::class.java)
                                     Log.d("firebase user", deckForUser.toString())
 
-
-                                if (deckForUser != null) {
-                                    deck.value = Deck(
-                                        deckTitle = deckForAll!!.deckTitle,
-                                        deckType = deckForUser!!.deckType,
-                                        cardList = deckForAll!!.cardList,
-                                        bookmarked = deckForUser!!.bookmarked,
-                                        shared = deckForAll!!.shared,
-                                        key = key
-                                    )
-                                    _deckState.value = DeckState.Valid(
-                                        deck.value!!
-                                    )
+                                    if (deckForUser != null) {
+                                        deck.value = Deck(
+                                            deckTitle = deckForAll!!.deckTitle,
+                                            deckType = deckForUser!!.deckType,
+                                            cardList = deckForAll!!.cardList,
+                                            bookmarked = deckForUser!!.bookmarked,
+                                            shared = deckForAll!!.shared,
+                                            key = key
+                                        )
+                                        _deckState.value = DeckState.Valid(
+                                            deck.value!!
+                                        )
+                                    }
+                                    else { // user에 존재하지 않음
+                                        if (deckForAll == null) {
+                                            _deckState.value = DeckState.Deleted
+                                            Log.d("firebase deleted deck", "ok")
+                                        } else {
+                                            deck.value = Deck(
+                                                deckTitle = deckForAll!!.deckTitle,
+                                                deckType = -1, // 사용자의 Deck도 아니고 추가된 Deck도 아님
+                                                cardList = deckForAll!!.cardList,
+                                                bookmarked = false,
+                                                shared = deckForAll!!.shared,
+                                                key = key
+                                            )
+                                            _deckState.value = DeckState.Valid(
+                                                deck.value!!
+                                            )
+                                        }
+                                    }
                                 }
-                                else { // user에 존재하지 않음
-                                    deck.value = Deck(
-                                        deckTitle = deckForAll!!.deckTitle,
-                                        deckType = -1, // 사용자의 Deck도 아니고 추가된 Deck도 아님
-                                        cardList = deckForAll!!.cardList,
-                                        bookmarked = false,
-                                        shared = deckForAll!!.shared,
-                                        key = key
-                                    )
-                                    _deckState.value = DeckState.Valid(
-                                        deck.value!!
-                                    )
+
+                                override fun onCancelled(error: DatabaseError) {
+
                                 }
-                            }
+                            })
 
-                            override fun onCancelled(error: DatabaseError) {
-
-                            }
-                        })
+                    }else { // user == null
+                        deck.value = Deck(
+                            deckTitle = deckForAll!!.deckTitle,
+                            deckType = -1, // 사용자의 Deck도 아니고 추가된 Deck도 아님
+                            cardList = deckForAll!!.cardList,
+                            bookmarked = false,
+                            shared = deckForAll!!.shared,
+                            key = key
+                        )
+                        _deckState.value = DeckState.Valid(
+                            deck.value!!
+                        )
+                    }
                 }
             }
 
