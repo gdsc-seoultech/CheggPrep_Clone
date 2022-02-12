@@ -33,7 +33,11 @@ import com.google.accompanist.pager.rememberPagerState
 @ExperimentalPagerApi
 @ExperimentalComposeUiApi
 @Composable
-fun CreateScreen(navController: NavHostController, viewModel: CreateViewModel) {
+fun CreateScreen(
+    navController: NavHostController,
+    viewModel: CreateViewModel,
+    update: () -> Unit
+) {
 
     val (deckTitle, setDeckTitle) = remember {
         mutableStateOf("")
@@ -94,6 +98,7 @@ fun CreateScreen(navController: NavHostController, viewModel: CreateViewModel) {
                             Screen.More.route
                         )
                     }else {
+                        update() // HomeScreen 업데이트 필요
                         navController.navigate(
                             Screen.Deck.route + "/$key"
                         )

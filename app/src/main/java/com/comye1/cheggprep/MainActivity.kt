@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
                                 homeViewModel.refresh()
                             }
                             MoreViewModel.Companion.UserEvent.SignOut -> {
-                                homeViewModel.refresh()
+                                homeViewModel.clearDecks()
                             }
                         }
                     }
@@ -99,12 +99,9 @@ class MainActivity : ComponentActivity() {
                     mutableStateOf(true)
                 }
 
-                /*
-                firebase 저장 실험
-                 */
-//                Firebase.database.reference.child("all").setValue("sample").addOnSuccessListener {
-//                    Toast.makeText(this, "firebase", Toast.LENGTH_LONG).show()
-//                }
+                val updateNeeded = remember {
+                    mutableStateOf(false)
+                }
 
                 Scaffold(
                     bottomBar = {
@@ -116,6 +113,11 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = Screen.Home.route) {
                         composable(Screen.Home.route) {
                             showBottomBar(true)
+                            if (updateNeeded.value) {
+                                homeViewModel.refresh()
+                                Log.d("home update", "called")
+                                updateNeeded.value = false
+                            }
                             HomeScreen(navController, homeViewModel)
                         }
                         composable(Screen.Search.route) {
@@ -124,7 +126,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Screen.Create.route) {
                             showBottomBar(false)
-                            CreateScreen(navController, createViewModel)
+                            CreateScreen(navController, createViewModel){
+                                updateNeeded.value = true
+                            }
                         }
                         composable(Screen.More.route) {
                             showBottomBar(true)
@@ -142,7 +146,7 @@ class MainActivity : ComponentActivity() {
                             DeckScreen(
                                 navController = navController,
                                 key = key
-                            )
+                            ) { updateNeeded.value = true }
                         }
                     }
                 }
