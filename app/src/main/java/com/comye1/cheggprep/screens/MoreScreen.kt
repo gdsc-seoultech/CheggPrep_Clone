@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.LightOrange
+import com.comye1.cheggprep.ui.theme.Teal
 import com.comye1.cheggprep.utils.getGoogleSignInClient
 import com.comye1.cheggprep.viewmodel.MoreState
 import com.comye1.cheggprep.viewmodel.MoreViewModel
@@ -207,7 +208,7 @@ fun AccountSection(
             )
             Text(
                 text = signText,
-                color = MaterialTheme.colors.secondaryVariant,
+                color = Teal,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable(onClick = signFunction)
             )
