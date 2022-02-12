@@ -5,8 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.comye1.cheggprep.models.*
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -19,6 +21,9 @@ class DeckViewModel : ViewModel() {
 
     private val _deckState = MutableStateFlow<DeckState>(DeckState.Loading)
     val deckState: StateFlow<DeckState> = _deckState
+
+    lateinit var database: DatabaseReference
+    var user: FirebaseUser? = null
 
     sealed class DeckState {
 
@@ -40,8 +45,8 @@ class DeckViewModel : ViewModel() {
      */
     fun getDeckByKey(key: String) {
 
-        val database = Firebase.database.reference
-        val user = FirebaseAuth.getInstance().currentUser!!
+        database = Firebase.database.reference
+        user = FirebaseAuth.getInstance().currentUser
 
         var deckForAll: DeckForAll? = null
         var deckForUser: DeckForUser? = null
@@ -57,11 +62,12 @@ class DeckViewModel : ViewModel() {
                     _deckState.value = DeckState.Deleted
                     Log.d("firebase deleted deck", "ok")
                 }else {
-                    database.child("user/${user.uid}/decks/$key")
-                        .addValueEventListener(object : ValueEventListener {
-                            override fun onDataChange(snapshot: DataSnapshot) {
-                                deckForUser = snapshot.getValue(DeckForUser::class.java)
-                                Log.d("firebase user", deckForUser.toString())
+                    if (user != null) {
+                        database.child("user/${user!!.uid}/decks/$key")
+                            .addValueEventListener(object : ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    deckForUser = snapshot.getValue(DeckForUser::class.java)
+                                    Log.d("firebase user", deckForUser.toString())
 
 
                                 if (deckForUser != null) {

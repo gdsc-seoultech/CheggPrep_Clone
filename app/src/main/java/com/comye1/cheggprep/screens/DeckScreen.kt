@@ -1,5 +1,6 @@
 package com.comye1.cheggprep.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -21,13 +23,12 @@ import androidx.navigation.NavController
 import com.comye1.cheggprep.models.Card
 import com.comye1.cheggprep.models.DECK_CREATED
 import com.comye1.cheggprep.models.DECK_ONLY_BOOKMARKED
-import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.Teal
 import com.comye1.cheggprep.viewmodel.DeckViewModel
 
 @Composable
-fun DeckScreen(navController: NavController, key: String) {
+fun DeckScreen(navController: NavController, key: String, update: () -> Unit) {
 
     val viewModel: DeckViewModel = viewModel()
 
@@ -41,11 +42,16 @@ fun DeckScreen(navController: NavController, key: String) {
         mutableStateOf(false)
     }
 
+    val context = LocalContext.current
+    val signInNeededToast: () -> Unit = { // 로그인 해야한다는 토스트 메시지 띄우기
+        Toast.makeText(context, "You should sign in for this feature.", Toast.LENGTH_SHORT).show()
+    }
+
     when (deckState) {
         is DeckViewModel.DeckState.Deleted -> { //원본이 삭제됨
             DeletedDeckDialog {
                 viewModel.deleteBookmark(key) // 북마크에서 삭제
-                navController.popBackStack() // 이전 화면으로 이동
+                update() // HomeScreen 업데이트 필요
             }
         }
         is DeckViewModel.DeckState.Valid -> {
@@ -82,13 +88,19 @@ fun DeckScreen(navController: NavController, key: String) {
                                         expanded = userMenuExpanded,
                                         dismiss = { setUserMenuExpanded(false) },
                                         delete = {
+                                            navController.popBackStack()
                                             viewModel.deleteDeck(key = deck.key)
-                                            navController.navigate(Screen.Home.route)
+                                            update() // HomeScreen 업데이트 필요
                                         }
                                     )
                                 }
                                 DECK_ONLY_BOOKMARKED -> {
-                                    IconButton(onClick = { viewModel.deleteBookmark(key = deck.key) }) {
+                                    IconButton(
+                                        onClick = {
+                                            viewModel.deleteBookmark(key = deck.key)
+                                            update() // HomeScreen 업데이트 필요
+                                        }
+                                    ) {
                                         Icon(
                                             imageVector = Icons.Default.Bookmark,
                                             contentDescription = "delete bookmark"
@@ -96,7 +108,14 @@ fun DeckScreen(navController: NavController, key: String) {
                                     }
                                 }
                                 else -> {
-                                    IconButton(onClick = { viewModel.addBookmark(key = deck.key) }) {
+                                    IconButton(onClick = {
+                                        if (viewModel.user == null) {
+                                            signInNeededToast() // 로그인 안 되어있는 경우
+                                        } else {
+                                            viewModel.addBookmark(key = deck.key) // 되어있는 경우
+                                            update() // HomeScreen 업데이트 필요
+                                        }
+                                    }) {
                                         Icon(
                                             imageVector = Icons.Default.BookmarkBorder,
                                             contentDescription = "add bookmark"
