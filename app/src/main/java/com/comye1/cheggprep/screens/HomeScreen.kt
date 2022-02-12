@@ -68,10 +68,10 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
             modifier = Modifier.padding(16.dp),
         ) {
             /*
-            key 역순으로 (최신순) 정렬
+            myDeckList 역순으로 정렬 (위로 갈수록 최신)
              */
             if (viewModel.user != null) {
-                viewModel.myDeckList.sortedByDescending { it.key }.let { list ->
+                viewModel.myDeckList.reversed().let { list ->
                     when (selectedFilterIndex) {
                         0 ->
                             list.forEach {
