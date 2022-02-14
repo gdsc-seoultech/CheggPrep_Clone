@@ -196,15 +196,20 @@ class DeckViewModel : ViewModel() {
         }
     }
 
-    fun updateDeckDetail(shared: Boolean, title: String): Boolean {
+    fun updateDeckDetail(title: String, shared: Boolean): Boolean {
+
+        val database = Firebase.database.reference
+
         deck.value?.let {
-            if (shared == it.shared && title == it.deckTitle) return false
+            return if (shared == it.shared && title == it.deckTitle) false
             else {
                 database.child("all/decks/${it.key}").apply {
                     child("deckTitle").setValue(title)
                     child("shared").setValue(shared)
                 }
-                return true
+                deck.value!!.deckTitle = title
+                deck.value!!.shared = shared
+                true
             }
         }
         return false
