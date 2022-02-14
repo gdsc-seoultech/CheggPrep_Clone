@@ -195,4 +195,18 @@ class DeckViewModel : ViewModel() {
             }
         }
     }
+
+    fun updateDeckDetail(shared: Boolean, title: String): Boolean {
+        deck.value?.let {
+            if (shared == it.shared && title == it.deckTitle) return false
+            else {
+                database.child("all/decks/${it.key}").apply {
+                    child("deckTitle").setValue(title)
+                    child("shared").setValue(shared)
+                }
+                return true
+            }
+        }
+        return false
+    }
 }
