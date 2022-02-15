@@ -113,6 +113,7 @@ fun CreateScreen(
 @ExperimentalComposeUiApi
 @Composable
 fun CreateCardScreen(
+    startIndex: Int = 0, // 바로 보여줄 인덱스
     cardList: List<Card>, //보여줄 & 수정할 카드 리스트
     setCard: (index: Int, card: Card) -> Unit, //카드 내용을 입력했을 때
     addCard: () -> Unit, //새로운 카드를 추가 (FAB 클릭 시)
@@ -126,9 +127,19 @@ fun CreateCardScreen(
         mutableStateOf(pagerState.pageCount)
     }
 
+    if (startIndex > 0) { // 특정 카드 수정 (0보다 큰 인덱스)
+        LaunchedEffect(key1 = true){
+            pagerState.scrollToPage(startIndex)
+        }
+    }else if (startIndex == -1) { // 카드 추가
+        LaunchedEffect(key1 = true){
+            addCard()
+        }
+    }
+
     // 스크롤 애니메이션 처리
     LaunchedEffect(key1 = pagerState.pageCount) { // 페이지 수가 변했을 때
-        if (prevPageCount < pagerState.pageCount) {
+        if (prevPageCount < pagerState.pageCount && pagerState.currentPageOffset >= 0) {
             // 추가된 경우 - 마지막 페이지로 스크롤
             pagerState.animateScrollToPage(pagerState.pageCount - 1, pagerState.currentPageOffset)
         }
