@@ -1,7 +1,9 @@
 package com.comye1.cheggprep.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.comye1.cheggprep.models.*
 import com.google.firebase.auth.FirebaseAuth
@@ -28,7 +30,7 @@ class DeckViewModel : ViewModel() {
     sealed class DeckState {
 
         // 로딩중 - 초기 상태
-         object Loading: DeckState()
+        object Loading : DeckState()
 
         // 삭제됨 - 북마크 한 Deck가 Owner에 의해 삭제됨
         object Deleted : DeckState()
@@ -39,6 +41,13 @@ class DeckViewModel : ViewModel() {
         // 유효함 - 자신의 Deck 또는 북마크/Add된 Deck가 Visible 상태임임
         class Valid(val deck: Deck) : DeckState()
     }
+
+    var edittingCardList = mutableStateListOf<Card>()
+
+    fun editCardList() {
+        edittingCardList = deck.value!!.cardList.toMutableStateList()
+    }
+
 
     /*
     전달받은 key로 deck 가져오기
@@ -58,10 +67,10 @@ class DeckViewModel : ViewModel() {
                 /*
                 all에 존재하지 않음 (북마크 해놓은 Deck가 삭제된 경우)
                  */
-                if (deckForAll == null){
+                if (deckForAll == null) {
                     _deckState.value = DeckState.Deleted
                     Log.d("firebase deleted deck", "ok")
-                }else {
+                } else {
                     if (user != null) {
                         database.child("user/${user!!.uid}/decks/$key")
                             .addValueEventListener(object : ValueEventListener {
@@ -81,8 +90,7 @@ class DeckViewModel : ViewModel() {
                                         _deckState.value = DeckState.Valid(
                                             deck.value!!
                                         )
-                                    }
-                                    else { // user에 존재하지 않음
+                                    } else { // user에 존재하지 않음
                                         if (deckForAll == null) {
                                             _deckState.value = DeckState.Deleted
                                             Log.d("firebase deleted deck", "ok")
@@ -107,7 +115,7 @@ class DeckViewModel : ViewModel() {
                                 }
                             })
 
-                    }else { // user == null
+                    } else { // user == null
                         deck.value = Deck(
                             deckTitle = deckForAll!!.deckTitle,
                             deckType = -1, // 사용자의 Deck도 아니고 추가된 Deck도 아님
@@ -209,6 +217,21 @@ class DeckViewModel : ViewModel() {
                 }
                 deck.value!!.deckTitle = title
                 deck.value!!.shared = shared
+                true
+            }
+        }
+        return false
+    }
+
+    fun updateCardList(): Boolean {
+
+        val database = Firebase.database.reference
+
+        deck.value?.let {
+            return if (edittingCardList == it.cardList) false
+            else {
+                database.child("all/decks/${it.key}").child("cardList").setValue(edittingCardList)
+                deck.value!!.cardList = edittingCardList
                 true
             }
         }
