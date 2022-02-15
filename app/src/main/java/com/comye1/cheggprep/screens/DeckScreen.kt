@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -30,7 +31,10 @@ import com.comye1.cheggprep.models.DECK_ONLY_BOOKMARKED
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.Teal
 import com.comye1.cheggprep.viewmodel.DeckViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
 
+@ExperimentalComposeUiApi
+@ExperimentalPagerApi
 @Composable
 fun DeckScreen(navController: NavController, key: String, update: () -> Unit) {
 
@@ -102,6 +106,7 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit) {
                                                         subNavController.navigate("edit_detail")
                                                     },
                                                     addCard = {
+                                                        viewModel.editCardList()
                                                         subNavController.navigate("add_card")
                                                     },
                                                     delete = {
@@ -204,7 +209,11 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit) {
                             }
                         ) { // onDone
 
-                            if (viewModel.updateDeckDetail(title = deckTitle, shared = visibility)) {
+                            if (viewModel.updateDeckDetail(
+                                    title = deckTitle,
+                                    shared = visibility
+                                )
+                            ) {
                                 // 리턴 값이 true일 때 업데이트 필요
                                 update()
                             }
@@ -212,10 +221,60 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit) {
                         }
                     }
                     composable("edit_card") {
+                        viewModel.edittingCardList.let { cardList ->
+                            CreateCardScreen(
+                                startIndex = 0, // TODO 선택된 인덱스(navigation argument)로 설정해야 함
+                                cardList = cardList, //SnapshotStateList<Card>가 전달된다
+                                setCard = { index, card ->
+                                    cardList[index] = card // Card field 변경
+                                },
+                                addCard = { cardList.add(Card("", "")) }, // 새 Card 추가
+                                removeCard = { index ->
+                                    cardList.removeAt(index) // Card 삭제
+                                    if (cardList.size == 0) cardList.add(Card("", ""))
+                                    // 삭제된 뒤에 cardList 사이즈가 0인 경우 새 Card 추가
+                                },
+                                navigateBack = {
+                                    subNavController.popBackStack()
+                                },
+                                onDone = {
+                                    // 뷰모델 함수 호출
+                                    // popBackStack
+                                    // 리턴 값 -> 업데이트 판단
+                                    viewModel.updateCardList()
+                                    subNavController.popBackStack()
+                                }
+                            )
 
+                        }
                     }
                     composable("add_card") {
+                        viewModel.edittingCardList.let { cardList ->
+                            CreateCardScreen(
+                                startIndex = -1,
+                                cardList = cardList, //SnapshotStateList<Card>가 전달된다
+                                setCard = { index, card ->
+                                    cardList[index] = card // Card field 변경
+                                },
+                                addCard = { cardList.add(Card("", "")) }, // 새 Card 추가
+                                removeCard = { index ->
+                                    cardList.removeAt(index) // Card 삭제
+                                    if (cardList.size == 0) cardList.add(Card("", ""))
+                                    // 삭제된 뒤에 cardList 사이즈가 0인 경우 새 Card 추가
+                                },
+                                navigateBack = {
+                                    subNavController.popBackStack()
+                                },
+                                onDone = {
+                                    // 뷰모델 함수 호출
+                                    // popBackStack
+                                    // 리턴 값 -> 업데이트 판단
+                                    viewModel.updateCardList()
+                                    subNavController.popBackStack()
+                                }
+                            )
 
+                        }
                     }
                 }
 
