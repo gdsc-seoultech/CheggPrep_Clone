@@ -123,9 +123,9 @@ fun CreateCardScreen(
 ) {
     val pagerState = rememberPagerState() // Pager의 상태 (페이지 수, 현재 페이지 등)
 
-    var prevPageCount by remember { // 이전 페이지 수를 기억
-        mutableStateOf(pagerState.pageCount)
-    }
+//    var prevPageCount by remember { // 이전 페이지 수를 기억
+//        mutableStateOf(pagerState.pageCount)
+//    }
 
     if (startIndex > 0) { // 특정 카드 수정 (0보다 큰 인덱스)
         LaunchedEffect(key1 = true){
@@ -137,15 +137,15 @@ fun CreateCardScreen(
         }
     }
 
-    // 스크롤 애니메이션 처리
-    LaunchedEffect(key1 = pagerState.pageCount) { // 페이지 수가 변했을 때
-        if (prevPageCount < pagerState.pageCount && pagerState.currentPageOffset >= 0) {
-            // 추가된 경우 - 마지막 페이지로 스크롤
-            pagerState.animateScrollToPage(pagerState.pageCount - 1, pagerState.currentPageOffset)
-        }
-        Log.d("pagecount", (pagerState.pageCount - 1).toString())
-        prevPageCount = pagerState.pageCount // prevPageCount를 업데이트
-    }
+//    // 스크롤 애니메이션 처리
+//    LaunchedEffect(key1 = pagerState.pageCount) { // 페이지 수가 변했을 때
+//        if (prevPageCount < pagerState.pageCount && pagerState.currentPageOffset >= 0) {
+//            // 추가된 경우 - 마지막 페이지로 스크롤
+//            pagerState.animateScrollToPage(pagerState.pageCount - 1, pagerState.currentPageOffset)
+//        }
+//        Log.d("pagecount", (pagerState.pageCount - 1).toString())
+//        prevPageCount = pagerState.pageCount // prevPageCount를 업데이트
+//    }
 
     Scaffold(
         topBar = {
