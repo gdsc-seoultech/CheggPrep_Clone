@@ -38,6 +38,7 @@ import com.comye1.cheggprep.ui.theme.Teal
 import com.comye1.cheggprep.viewmodel.DeckViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 
+@ExperimentalMaterialApi
 @ExperimentalComposeUiApi
 @ExperimentalPagerApi
 @Composable
@@ -153,32 +154,9 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit) {
                             )
                         },
                         bottomBar = {
-                            Column(modifier = Modifier.background(color = Color.White)) {
-                                Divider(
-                                    modifier = Modifier.height(2.dp),
-                                    color = Color.LightGray
-                                )
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 16.dp),
-                                    horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Row(modifier = Modifier
-                                        .clip(shape = CircleShape)
-                                        .clickable { }
-                                        .background(color = DeepOrange)
-                                        .padding(horizontal = 24.dp, vertical = 8.dp)) {
-                                        Text(
-                                            text = "Practice all cards",
-                                            color = Color.White,
-                                            style = MaterialTheme.typography.h5,
-                                            fontWeight = FontWeight.ExtraBold
-                                        )
-                                    }
-                                }
-                            }
+                            DeckScreenBottomBar(onClick = {
+                                subNavController.navigate("practice")
+                            })
                         }
                     ) {
                         Column(
@@ -308,10 +286,45 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit) {
 
                     }
                 }
+                composable("practice") {
+                    PracticeScreen(cardList = viewModel.deck.value!!.cardList){
+                        subNavController.popBackStack()
+                    }
+                }
             }
 
         }
         else -> {
+        }
+    }
+}
+
+@Composable
+fun DeckScreenBottomBar(onClick: () -> Unit) {
+    Column(modifier = Modifier.background(color = Color.White)) {
+        Divider(
+            modifier = Modifier.height(2.dp),
+            color = Color.LightGray
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(modifier = Modifier
+                .clip(shape = CircleShape)
+                .clickable { onClick() }
+                .background(color = DeepOrange)
+                .padding(horizontal = 24.dp, vertical = 8.dp)) {
+                Text(
+                    text = "Practice all cards",
+                    color = Color.White,
+                    style = MaterialTheme.typography.h5,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            }
         }
     }
 }
