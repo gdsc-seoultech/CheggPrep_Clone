@@ -93,11 +93,11 @@ fun CreateScreen(
                     )
                     viewModel.toTitleScreen() // 화면 TitleScreen으로 복귀
                     navController.popBackStack() // 생성 완료 후 Create로 다시 돌아가지 않도록
-                    if(key == "LOGIN_NEEDED") {
+                    if (key == "LOGIN_NEEDED") {
                         navController.navigate(
                             Screen.More.route
                         )
-                    }else {
+                    } else {
                         update() // HomeScreen 업데이트 필요
                         navController.navigate(
                             Screen.Deck.route + "/$key"
@@ -123,29 +123,37 @@ fun CreateCardScreen(
 ) {
     val pagerState = rememberPagerState() // Pager의 상태 (페이지 수, 현재 페이지 등)
 
-//    var prevPageCount by remember { // 이전 페이지 수를 기억
-//        mutableStateOf(pagerState.pageCount)
-//    }
+    var scrollToEnd by remember { // 카드 추가 시 변화
+        mutableStateOf(0)
+    }
+
+    var scrollForward by remember { // 카드 삭제 시 변화
+        mutableStateOf(0)
+    }
 
     if (startIndex > 0) { // 특정 카드 수정 (0보다 큰 인덱스)
-        LaunchedEffect(key1 = true){
-            pagerState.scrollToPage(startIndex)
+        LaunchedEffect(key1 = true) {
+            pagerState.animateScrollToPage(startIndex)
         }
-    }else if (startIndex == -1) { // 카드 추가
-        LaunchedEffect(key1 = true){
+    } else if (startIndex == -1) { // 카드 추가
+        LaunchedEffect(key1 = true) {
             addCard()
+            scrollToEnd++ // 맨 뒤로 스크롤
         }
     }
 
-//    // 스크롤 애니메이션 처리
-//    LaunchedEffect(key1 = pagerState.pageCount) { // 페이지 수가 변했을 때
-//        if (prevPageCount < pagerState.pageCount && pagerState.currentPageOffset >= 0) {
-//            // 추가된 경우 - 마지막 페이지로 스크롤
-//            pagerState.animateScrollToPage(pagerState.pageCount - 1, pagerState.currentPageOffset)
-//        }
-//        Log.d("pagecount", (pagerState.pageCount - 1).toString())
-//        prevPageCount = pagerState.pageCount // prevPageCount를 업데이트
-//    }
+    // 카드 추가 시 맨 뒤로 스크롤
+    LaunchedEffect(scrollToEnd) {
+        if (scrollToEnd > 0) {
+            pagerState.animateScrollToPage(pagerState.pageCount - 1, pagerState.currentPageOffset)
+        }
+    }
+    // 카드 삭제 시 하나 앞으로 스크롤
+    LaunchedEffect(scrollForward) {
+        if (scrollForward > 0 && pagerState.currentPage > 0){
+            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -158,7 +166,7 @@ fun CreateCardScreen(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "${pagerState.currentPage + 1}/${pagerState.pageCount}", //
+                            text = "${pagerState.currentPage + 1}/${pagerState.pageCount}",
                             style = MaterialTheme.typography.h5,
                             fontWeight = FontWeight.Bold
                         )
@@ -186,7 +194,10 @@ fun CreateCardScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = addCard, // 카드 추가
+                onClick = {
+                    addCard()
+                    scrollToEnd++
+                }, // 카드 추가
                 backgroundColor = Color.White,
                 modifier = Modifier
                     .size(48.dp)
@@ -218,7 +229,10 @@ fun CreateCardScreen(
                             setCard(page, card)
                             // CardItemField가 전달하는 card로 해당 page에 set
                         },
-                        removeCard = { removeCard(page) } // page에 해당하는 card 삭제
+                        removeCard = {
+                            removeCard(page)
+                            scrollForward++
+                        } // page에 해당하는 card 삭제
                     )
                 }
             }
