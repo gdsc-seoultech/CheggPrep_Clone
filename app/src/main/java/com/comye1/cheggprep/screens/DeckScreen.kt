@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -177,15 +179,21 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit) {
                                 }
                             }
                         ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp, 16.dp, 16.dp, 80.dp)
+                            ) {
                                 Text(
                                     text = deck.cardList.size.toString() + if (deck.cardList.size > 1) " Cards" else " Card",
                                     color = Color.Gray
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
-                                deck.cardList.forEach {
-                                    CardItem(card = Card(it.front, it.back))
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                LazyColumn {
+                                    items(deck.cardList) {
+                                        CardItem(card = Card(it.front, it.back))
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
                                 }
                             }
                         }
