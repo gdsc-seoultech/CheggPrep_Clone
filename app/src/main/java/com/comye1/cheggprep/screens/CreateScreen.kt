@@ -65,7 +65,7 @@ fun CreateScreen(
             )
         }
         CreateState.CardScreen -> {
-            if(deckTitle.isEmpty()) // title은 날아가고 화면은 CardScreen을 보여주는 경우
+            if (deckTitle.isEmpty()) // title은 날아가고 화면은 CardScreen을 보여주는 경우
                 viewModel.toTitleScreen()
 
             CreateCardScreen(
@@ -144,13 +144,11 @@ fun CreateCardScreen(
 
     // 카드 추가 시 맨 뒤로 스크롤
     LaunchedEffect(scrollToEnd) {
-        if (scrollToEnd > 0) {
-            pagerState.animateScrollToPage(pagerState.pageCount - 1, pagerState.currentPageOffset)
-        }
+        pagerState.animateScrollToPage(pagerState.pageCount - 1, pagerState.currentPageOffset)
     }
     // 카드 삭제 시 하나 앞으로 스크롤
     LaunchedEffect(scrollForward) {
-        if (scrollForward > 0 && pagerState.currentPage > 0){
+        if (pagerState.currentPage > 0) {
             pagerState.animateScrollToPage(pagerState.currentPage - 1)
         }
     }
