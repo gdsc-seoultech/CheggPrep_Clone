@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.comye1.cheggprep.SampleDataSet
+import com.comye1.cheggprep.models.Card
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -31,9 +31,11 @@ import com.google.accompanist.pager.rememberPagerState
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
-fun PracticeScreen() {
+fun PracticeScreen(cardList: List<Card>, close: () -> Unit) {
 
-    val sampleData = SampleDataSet.myDeckSample[0].cardList // 샘플 데이터 가져옴
+    var list by remember {
+        mutableStateOf(cardList)
+    }
 
     val pagerState = rememberPagerState() // Pager의 상태 (페이지 수, 현재 페이지 등)
 
@@ -41,7 +43,7 @@ fun PracticeScreen() {
         mutableStateOf(0f)
     }
 
-    SideEffect {
+    LaunchedEffect(true) {
         setCount(1f)
     }
 
@@ -57,14 +59,14 @@ fun PracticeScreen() {
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "${pagerState.currentPage + 1}/${sampleData.size}",
+                        text = "${pagerState.currentPage + 1}/${list.size}",
                         style = MaterialTheme.typography.h5,
                         fontWeight = FontWeight.Bold
                     )
                 }
             },
             navigationIcon = {
-                IconButton(onClick = { }) {
+                IconButton(onClick = { close() }) {
                     Icon(
                         imageVector = Icons.Outlined.Close,
                         contentDescription = "close screen"
@@ -72,7 +74,9 @@ fun PracticeScreen() {
                 }
             },
             actions = {
-                IconButton(onClick = { }) {
+                IconButton(onClick = {
+                    list = list.shuffled()
+                }) {
                     Icon(
                         imageVector = Icons.Outlined.Shuffle,
                         contentDescription = "shuffle cards"
@@ -88,11 +92,11 @@ fun PracticeScreen() {
         Column {
             // 프로그레스바
             Box(modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp)) {
-                ProgressBar(count = count, totCount = sampleData.size)
+                ProgressBar(count = count, totCount = list.size)
             }
             Box {
                 HorizontalPager( // Pager
-                    count = sampleData.size,
+                    count = list.size,
                     state = pagerState, // 선언한 pagerState 사용 (선언하지 않으면 내부에서 자동으로 사용)
                     contentPadding = PaddingValues(32.dp)
                     // 양쪽에 이전, 다음 카드를 보여줌
@@ -100,10 +104,10 @@ fun PracticeScreen() {
 
                     FlipCard(
                         back = {
-                            CardBack(text = sampleData[page].back)
+                            CardBack(text = list[page].back)
                         },
                         front = {
-                            CardFront(text = sampleData[page].front)
+                            CardFront(text = list[page].front)
                         }
                     )
                 }
