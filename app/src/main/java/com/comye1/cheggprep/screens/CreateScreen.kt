@@ -177,7 +177,8 @@ fun CreateCardScreen(
                         Text(
                             "Done",
                             style = MaterialTheme.typography.h6,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = DeepOrange
                         )
                     }
                 }
@@ -263,7 +264,8 @@ fun CreateTitleScreen(
                     Text(
                         "Next",
                         style = MaterialTheme.typography.h6,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = DeepOrange
                     )
                 }
             }
