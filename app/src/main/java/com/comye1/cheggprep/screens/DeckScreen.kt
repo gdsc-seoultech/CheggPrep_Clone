@@ -7,10 +7,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -24,8 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.comye1.cheggprep.models.Card
 import com.comye1.cheggprep.models.DECK_CREATED
@@ -190,9 +194,22 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit) {
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 LazyColumn {
-                                    items(deck.cardList) {
-                                        CardItem(card = Card(it.front, it.back))
-                                        Spacer(modifier = Modifier.height(8.dp))
+                                    if (deck.deckType == DECK_CREATED) {
+                                        itemsIndexed(deck.cardList) { index, card ->
+                                            MyCardItem(
+                                                card = Card(card.front, card.back),
+                                                edit = {
+                                                    viewModel.editCardList()
+                                                    subNavController.navigate("edit_card/${index}")
+                                                }
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                        }
+                                    } else {
+                                        items(deck.cardList) {
+                                            CardItem(card = Card(it.front, it.back))
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                        }
                                     }
                                 }
                             }
@@ -228,10 +245,16 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit) {
                             subNavController.popBackStack()
                         }
                     }
-                    composable("edit_card") {
+                    composable("edit_card/{index}",
+                    arguments = listOf(navArgument("index"){
+                        type = NavType.IntType
+                        defaultValue = 0
+                    })
+                    ) { backStackEntry ->
+                        val index = backStackEntry.arguments?.getInt("index")?: 0
                         viewModel.edittingCardList.let { cardList ->
                             CreateCardScreen(
-                                startIndex = 0, // TODO 선택된 인덱스(navigation argument)로 설정해야 함
+                                startIndex = index, // TODO 선택된 인덱스(navigation argument)로 설정해야 함
                                 cardList = cardList, //SnapshotStateList<Card>가 전달된다
                                 setCard = { index, card ->
                                     cardList[index] = card // Card field 변경
@@ -464,5 +487,43 @@ fun CardItem(card: Card) {
             color = Color.Gray,
             fontWeight = FontWeight.Bold
         )
+    }
+}
+
+@Composable
+fun MyCardItem(card: Card, edit: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(width = 2.dp, color = Color.LightGray)
+    ) {
+        Text(
+            text = card.front,
+            modifier = Modifier.padding(16.dp),
+            fontWeight = FontWeight.ExtraBold
+        )
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(2.dp), color = Color.LightGray
+        )
+        Text(
+            text = card.back,
+            modifier = Modifier.padding(16.dp),
+            color = Color.Gray,
+            fontWeight = FontWeight.Bold
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            IconButton(onClick = edit) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "edit this card",
+                    tint = Color.LightGray
+                )
+            }
+        }
     }
 }
