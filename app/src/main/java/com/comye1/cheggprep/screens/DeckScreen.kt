@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -68,249 +67,249 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit) {
             }
         }
         is DeckViewModel.DeckState.Valid -> {
-            deckState.deck.let { deck ->
 
-                NavHost(navController = subNavController, startDestination = "main") {
-                    composable("main") {
-                        val (userMenuExpanded, setUserMenuExpanded) = remember {
-                            mutableStateOf(false)
-                        }
+            NavHost(navController = subNavController, startDestination = "main") {
+                composable("main") {
+                    val (userMenuExpanded, setUserMenuExpanded) = remember {
+                        mutableStateOf(false)
+                    }
 
-                        Scaffold(
-                            topBar = {
-                                TopAppBar(
-                                    elevation = 0.dp,
-                                    backgroundColor = Color.White,
-                                    title = { Text(text = deck.deckTitle) },
-                                    navigationIcon = {
-                                        IconButton(onClick = { navController.popBackStack() }) {
-                                            Icon(
-                                                imageVector = Icons.Default.ArrowBack,
-                                                contentDescription = "navigate back"
-                                            )
-                                        }
-                                    },
-                                    actions = {
-                                        IconButton(onClick = { /*TODO*/ }) {
-                                            Icon(
-                                                imageVector = Icons.Default.Share,
-                                                contentDescription = "share"
-                                            )
-                                        }
-                                        when (deck.deckType) {
-                                            DECK_CREATED -> {
-                                                IconButton(onClick = { setUserMenuExpanded(true) }) {
-                                                    Icon(
-                                                        imageVector = Icons.Default.MoreVert,
-                                                        contentDescription = "more"
-                                                    )
-                                                }
-                                                UserDeckMenu(
-                                                    expanded = userMenuExpanded,
-                                                    dismiss = { setUserMenuExpanded(false) },
-                                                    editTitle = {
-                                                        subNavController.navigate("edit_detail")
-                                                    },
-                                                    addCard = {
-                                                        viewModel.editCardList()
-                                                        subNavController.navigate("add_card")
-                                                    },
-                                                    delete = {
-                                                        navController.popBackStack()
-                                                        viewModel.deleteDeck(key = deck.key)
-                                                        update() // HomeScreen 업데이트 필요
-                                                    }
+                    Scaffold(
+                        topBar = {
+                            TopAppBar(
+                                elevation = 0.dp,
+                                backgroundColor = Color.White,
+                                title = { Text(text = viewModel.deck.value!!.deckTitle) },
+                                navigationIcon = {
+                                    IconButton(onClick = { navController.popBackStack() }) {
+                                        Icon(
+                                            imageVector = Icons.Default.ArrowBack,
+                                            contentDescription = "navigate back"
+                                        )
+                                    }
+                                },
+                                actions = {
+                                    IconButton(onClick = { /*TODO*/ }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Share,
+                                            contentDescription = "share"
+                                        )
+                                    }
+                                    when (viewModel.deck.value!!.deckType) {
+                                        DECK_CREATED -> {
+                                            IconButton(onClick = { setUserMenuExpanded(true) }) {
+                                                Icon(
+                                                    imageVector = Icons.Default.MoreVert,
+                                                    contentDescription = "more"
                                                 )
                                             }
-                                            DECK_ONLY_BOOKMARKED -> {
-                                                IconButton(
-                                                    onClick = {
-                                                        viewModel.deleteBookmark(key = deck.key)
-                                                        update() // HomeScreen 업데이트 필요
-                                                    }
-                                                ) {
-                                                    Icon(
-                                                        imageVector = Icons.Default.Bookmark,
-                                                        contentDescription = "delete bookmark"
-                                                    )
+                                            UserDeckMenu(
+                                                expanded = userMenuExpanded,
+                                                dismiss = { setUserMenuExpanded(false) },
+                                                editTitle = {
+                                                    subNavController.navigate("edit_detail")
+                                                },
+                                                addCard = {
+                                                    viewModel.editCardList()
+                                                    subNavController.navigate("add_card")
+                                                },
+                                                delete = {
+                                                    navController.popBackStack()
+                                                    viewModel.deleteDeck(key = viewModel.deck.value!!.key)
+                                                    update() // HomeScreen 업데이트 필요
                                                 }
-                                            }
-                                            else -> {
-                                                IconButton(onClick = {
-                                                    if (viewModel.user == null) {
-                                                        signInNeededToast() // 로그인 안 되어있는 경우
-                                                    } else {
-                                                        viewModel.addBookmark(key = deck.key) // 되어있는 경우
-                                                        update() // HomeScreen 업데이트 필요
-                                                    }
-                                                }) {
-                                                    Icon(
-                                                        imageVector = Icons.Default.BookmarkBorder,
-                                                        contentDescription = "add bookmark"
-                                                    )
+                                            )
+                                        }
+                                        DECK_ONLY_BOOKMARKED -> {
+                                            IconButton(
+                                                onClick = {
+                                                    viewModel.deleteBookmark(key = viewModel.deck.value!!.key)
+                                                    update() // HomeScreen 업데이트 필요
                                                 }
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Bookmark,
+                                                    contentDescription = "delete bookmark"
+                                                )
                                             }
                                         }
-                                    }
-                                )
-                            },
-                            bottomBar = {
-                                Column(modifier = Modifier.background(color = Color.White)) {
-                                    Divider(
-                                        modifier = Modifier.height(2.dp),
-                                        color = Color.LightGray
-                                    )
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 16.dp),
-                                        horizontalArrangement = Arrangement.Center,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Row(modifier = Modifier
-                                            .clip(shape = CircleShape)
-                                            .clickable { }
-                                            .background(color = DeepOrange)
-                                            .padding(horizontal = 24.dp, vertical = 8.dp)) {
-                                            Text(
-                                                text = "Practice all cards",
-                                                color = Color.White,
-                                                style = MaterialTheme.typography.h5,
-                                                fontWeight = FontWeight.ExtraBold
-                                            )
+                                        else -> {
+                                            IconButton(onClick = {
+                                                if (viewModel.user == null) {
+                                                    signInNeededToast() // 로그인 안 되어있는 경우
+                                                } else {
+                                                    viewModel.addBookmark(key = viewModel.deck.value!!.key) // 되어있는 경우
+                                                    update() // HomeScreen 업데이트 필요
+                                                }
+                                            }) {
+                                                Icon(
+                                                    imageVector = Icons.Default.BookmarkBorder,
+                                                    contentDescription = "add bookmark"
+                                                )
+                                            }
                                         }
                                     }
                                 }
+                            )
+                        },
+                        bottomBar = {
+                            Column(modifier = Modifier.background(color = Color.White)) {
+                                Divider(
+                                    modifier = Modifier.height(2.dp),
+                                    color = Color.LightGray
+                                )
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 16.dp),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(modifier = Modifier
+                                        .clip(shape = CircleShape)
+                                        .clickable { }
+                                        .background(color = DeepOrange)
+                                        .padding(horizontal = 24.dp, vertical = 8.dp)) {
+                                        Text(
+                                            text = "Practice all cards",
+                                            color = Color.White,
+                                            style = MaterialTheme.typography.h5,
+                                            fontWeight = FontWeight.ExtraBold
+                                        )
+                                    }
+                                }
                             }
+                        }
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp, 16.dp, 16.dp, 80.dp)
                         ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(16.dp, 16.dp, 16.dp, 80.dp)
-                            ) {
+                            viewModel.deck.value!!.cardList.size.let {
                                 Text(
-                                    text = deck.cardList.size.toString() + if (deck.cardList.size > 1) " Cards" else " Card",
+                                    text = it.toString() + if (it > 1) " Cards" else " Card",
                                     color = Color.Gray
                                 )
-                                Spacer(modifier = Modifier.height(16.dp))
-                                LazyColumn {
-                                    if (deck.deckType == DECK_CREATED) {
-                                        itemsIndexed(deck.cardList) { index, card ->
-                                            MyCardItem(
-                                                card = Card(card.front, card.back),
-                                                edit = {
-                                                    viewModel.editCardList()
-                                                    subNavController.navigate("edit_card/${index}")
-                                                }
-                                            )
-                                            Spacer(modifier = Modifier.height(8.dp))
-                                        }
-                                    } else {
-                                        items(deck.cardList) {
-                                            CardItem(card = Card(it.front, it.back))
-                                            Spacer(modifier = Modifier.height(8.dp))
-                                        }
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                            LazyColumn {
+                                if (viewModel.deck.value!!.deckType == DECK_CREATED) {
+                                    itemsIndexed(viewModel.deck.value!!.cardList) { index, card ->
+                                        MyCardItem(
+                                            card = Card(card.front, card.back),
+                                            edit = {
+                                                viewModel.editCardList()
+                                                subNavController.navigate("edit_card/${index}")
+                                            }
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
+                                } else {
+                                    items(viewModel.deck.value!!.cardList) {
+                                        CardItem(card = Card(it.front, it.back))
+                                        Spacer(modifier = Modifier.height(8.dp))
                                     }
                                 }
                             }
-                        }
-                    }
-                    composable("edit_detail") {
-                        val (deckTitle, setDeckTitle) = rememberSaveable {
-                            mutableStateOf(deck.deckTitle)
-                        }
-
-                        val (visibility, setVisibility) = rememberSaveable {
-                            mutableStateOf(deck.shared)
-                        }
-
-                        EditDeck(
-                            deckTitle = deckTitle,
-                            setDeckTitle = setDeckTitle,
-                            visibility = visibility,
-                            setVisibility = setVisibility,
-                            navigateBack = {
-                                subNavController.popBackStack()
-                            }
-                        ) { // onDone
-
-                            if (viewModel.updateDeckDetail(
-                                    title = deckTitle,
-                                    shared = visibility
-                                )
-                            ) {
-                                // 리턴 값이 true일 때 업데이트 필요
-                                update()
-                            }
-                            subNavController.popBackStack()
-                        }
-                    }
-                    composable("edit_card/{index}",
-                    arguments = listOf(navArgument("index"){
-                        type = NavType.IntType
-                        defaultValue = 0
-                    })
-                    ) { backStackEntry ->
-                        val index = backStackEntry.arguments?.getInt("index")?: 0
-                        viewModel.edittingCardList.let { cardList ->
-                            CreateCardScreen(
-                                startIndex = index, // TODO 선택된 인덱스(navigation argument)로 설정해야 함
-                                cardList = cardList, //SnapshotStateList<Card>가 전달된다
-                                setCard = { index, card ->
-                                    cardList[index] = card // Card field 변경
-                                },
-                                addCard = { cardList.add(Card("", "")) }, // 새 Card 추가
-                                removeCard = { index ->
-                                    cardList.removeAt(index) // Card 삭제
-                                    if (cardList.size == 0) cardList.add(Card("", ""))
-                                    // 삭제된 뒤에 cardList 사이즈가 0인 경우 새 Card 추가
-                                },
-                                navigateBack = {
-                                    subNavController.popBackStack()
-                                },
-                                onDone = {
-                                    // 뷰모델 함수 호출
-                                    // popBackStack
-                                    // 리턴 값 -> 업데이트 판단
-                                    viewModel.updateCardList()
-                                    subNavController.popBackStack()
-                                }
-                            )
-
-                        }
-                    }
-                    composable("add_card") {
-                        viewModel.edittingCardList.let { cardList ->
-                            CreateCardScreen(
-                                startIndex = -1,
-                                cardList = cardList, //SnapshotStateList<Card>가 전달된다
-                                setCard = { index, card ->
-                                    cardList[index] = card // Card field 변경
-                                },
-                                addCard = { cardList.add(Card("", "")) }, // 새 Card 추가
-                                removeCard = { index ->
-                                    cardList.removeAt(index) // Card 삭제
-                                    if (cardList.size == 0) cardList.add(Card("", ""))
-                                    // 삭제된 뒤에 cardList 사이즈가 0인 경우 새 Card 추가
-                                },
-                                navigateBack = {
-                                    subNavController.popBackStack()
-                                },
-                                onDone = {
-                                    // 뷰모델 함수 호출
-                                    // popBackStack
-                                    // 리턴 값 -> 업데이트 판단
-                                    viewModel.updateCardList()
-                                    subNavController.popBackStack()
-                                }
-                            )
-
                         }
                     }
                 }
+                composable("edit_detail") {
+                    val (deckTitle, setDeckTitle) = rememberSaveable {
+                        mutableStateOf(viewModel.deck.value!!.deckTitle)
+                    }
 
+                    val (visibility, setVisibility) = rememberSaveable {
+                        mutableStateOf(viewModel.deck.value!!.shared)
+                    }
 
+                    EditDeck(
+                        deckTitle = deckTitle,
+                        setDeckTitle = setDeckTitle,
+                        visibility = visibility,
+                        setVisibility = setVisibility,
+                        navigateBack = {
+                            subNavController.popBackStack()
+                        }
+                    ) { // onDone
+
+                        if (viewModel.updateDeckDetail(
+                                title = deckTitle,
+                                shared = visibility
+                            )
+                        ) {
+                            // 리턴 값이 true일 때 업데이트 필요
+                            update()
+                        }
+                        subNavController.popBackStack()
+                    }
+                }
+                composable(
+                    "edit_card/{index}",
+                    arguments = listOf(navArgument("index") {
+                        type = NavType.IntType
+                        defaultValue = 0
+                    })
+                ) { backStackEntry ->
+                    val index = backStackEntry.arguments?.getInt("index") ?: 0
+                    viewModel.edittingCardList.let { cardList ->
+                        CreateCardScreen(
+                            startIndex = index, // TODO 선택된 인덱스(navigation argument)로 설정해야 함
+                            cardList = cardList, //SnapshotStateList<Card>가 전달된다
+                            setCard = { index, card ->
+                                cardList[index] = card // Card field 변경
+                            },
+                            addCard = { cardList.add(Card("", "")) }, // 새 Card 추가
+                            removeCard = { index ->
+                                cardList.removeAt(index) // Card 삭제
+                                if (cardList.size == 0) cardList.add(Card("", ""))
+                                // 삭제된 뒤에 cardList 사이즈가 0인 경우 새 Card 추가
+                            },
+                            navigateBack = {
+                                subNavController.popBackStack()
+                            },
+                            onDone = {
+                                // 뷰모델 함수 호출
+                                // popBackStack
+                                // 리턴 값 -> 업데이트 판단
+                                viewModel.updateCardList()
+                                subNavController.popBackStack()
+                            }
+                        )
+
+                    }
+                }
+                composable("add_card") {
+                    viewModel.edittingCardList.let { cardList ->
+                        CreateCardScreen(
+                            startIndex = -1,
+                            cardList = cardList, //SnapshotStateList<Card>가 전달된다
+                            setCard = { index, card ->
+                                cardList[index] = card // Card field 변경
+                            },
+                            addCard = { cardList.add(Card("", "")) }, // 새 Card 추가
+                            removeCard = { index ->
+                                cardList.removeAt(index) // Card 삭제
+                                if (cardList.size == 0) cardList.add(Card("", ""))
+                                // 삭제된 뒤에 cardList 사이즈가 0인 경우 새 Card 추가
+                            },
+                            navigateBack = {
+                                subNavController.popBackStack()
+                            },
+                            onDone = {
+                                // 뷰모델 함수 호출
+                                // popBackStack
+                                // 리턴 값 -> 업데이트 판단
+                                viewModel.updateCardList()
+                                subNavController.popBackStack()
+                            }
+                        )
+
+                    }
+                }
             }
+
         }
         else -> {
         }

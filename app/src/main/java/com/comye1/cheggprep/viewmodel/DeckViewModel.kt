@@ -39,7 +39,7 @@ class DeckViewModel : ViewModel() {
         // object Invisible : DeckState()
 
         // 유효함 - 자신의 Deck 또는 북마크/Add된 Deck가 Visible 상태임임
-        class Valid(val deck: Deck) : DeckState()
+        class Valid() : DeckState()
     }
 
     var edittingCardList = mutableStateListOf<Card>()
@@ -87,9 +87,7 @@ class DeckViewModel : ViewModel() {
                                             shared = deckForAll!!.shared,
                                             key = key
                                         )
-                                        _deckState.value = DeckState.Valid(
-                                            deck.value!!
-                                        )
+                                        _deckState.value = DeckState.Valid()
                                     } else { // user에 존재하지 않음
                                         if (deckForAll == null) {
                                             _deckState.value = DeckState.Deleted
@@ -103,9 +101,7 @@ class DeckViewModel : ViewModel() {
                                                 shared = deckForAll!!.shared,
                                                 key = key
                                             )
-                                            _deckState.value = DeckState.Valid(
-                                                deck.value!!
-                                            )
+                                            _deckState.value = DeckState.Valid()
                                         }
                                     }
                                 }
@@ -124,9 +120,7 @@ class DeckViewModel : ViewModel() {
                             shared = deckForAll!!.shared,
                             key = key
                         )
-                        _deckState.value = DeckState.Valid(
-                            deck.value!!
-                        )
+                        _deckState.value = DeckState.Valid()
                     }
                 }
             }
