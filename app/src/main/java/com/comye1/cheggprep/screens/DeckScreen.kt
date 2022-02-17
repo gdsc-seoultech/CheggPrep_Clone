@@ -33,6 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import com.comye1.cheggprep.models.Card
 import com.comye1.cheggprep.models.DECK_CREATED
 import com.comye1.cheggprep.models.DECK_ONLY_BOOKMARKED
+import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.Teal
 import com.comye1.cheggprep.viewmodel.DeckViewModel
@@ -42,7 +43,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 @ExperimentalComposeUiApi
 @ExperimentalPagerApi
 @Composable
-fun DeckScreen(navController: NavController, key: String, update: () -> Unit) {
+fun DeckScreen(navController: NavController, key: String, update: () -> Unit, shareDeck: (String) -> Unit) {
 
     val viewModel: DeckViewModel = viewModel()
 
@@ -90,7 +91,7 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit) {
                                     }
                                 },
                                 actions = {
-                                    IconButton(onClick = { /*TODO*/ }) {
+                                    IconButton(onClick = { shareDeck(viewModel.deck.value!!.toText()) }) {
                                         Icon(
                                             imageVector = Icons.Default.Share,
                                             contentDescription = "share"
@@ -538,4 +539,16 @@ fun MyCardItem(card: Card, edit: () -> Unit) {
             }
         }
     }
+}
+
+private fun Deck.toText(): String {
+    var str = "[Chegg Prep]\n"
+    str += "${this.deckTitle} - "
+    this.cardList.size.let {
+        str += it.toString() + if (it > 1) " cards" else " card"
+    }
+    this.cardList.forEachIndexed { idx, card ->
+        str += "\n\n▶ ${idx+1}. ${card.front} \n${card.back}"
+    }
+    return str
 }

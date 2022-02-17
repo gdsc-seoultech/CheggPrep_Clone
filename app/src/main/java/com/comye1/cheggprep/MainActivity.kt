@@ -1,5 +1,6 @@
 package com.comye1.cheggprep
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -49,6 +50,15 @@ class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var user: FirebaseUser
 
+    private fun shareText(text: String) {
+        startActivity(getShareIntent(text))
+    }
+
+    private fun getShareIntent(text: String) = Intent(Intent.ACTION_SEND)
+        .setType("text/plain")
+        .putExtra(Intent.EXTRA_TEXT, text)
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -78,7 +88,7 @@ class MainActivity : ComponentActivity() {
                  */
                 lifecycleScope.launchWhenCreated {
                     moreViewModel.userEvent.collect { event ->
-                        when(event) {
+                        when (event) {
                             MoreViewModel.Companion.UserEvent.SignIn -> {
                                 homeViewModel.refresh()
                             }
@@ -126,7 +136,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Screen.Create.route) {
                             showBottomBar(false)
-                            CreateScreen(navController, createViewModel){
+                            CreateScreen(navController, createViewModel) {
                                 updateNeeded.value = true
                             }
                         }
@@ -145,8 +155,10 @@ class MainActivity : ComponentActivity() {
                             showBottomBar(false)
                             DeckScreen(
                                 navController = navController,
-                                key = key
-                            ) { updateNeeded.value = true }
+                                key = key,
+                                update = { updateNeeded.value = true },
+                                shareDeck = { shareText(it) }
+                            )
                         }
                     }
                 }
