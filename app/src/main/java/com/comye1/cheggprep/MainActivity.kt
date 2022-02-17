@@ -51,12 +51,17 @@ class MainActivity : ComponentActivity() {
     private lateinit var user: FirebaseUser
 
     private fun shareText(text: String) {
-        startActivity(getShareIntent(text))
+        val shareIntent = Intent.createChooser(getSendIntent(text), null)
+        // ACTION_SEND나 ACTION_SEND_MULTIPLE가 아닐 때에만 title을 지정할 수 있다.
+        startActivity(shareIntent)
     }
 
-    private fun getShareIntent(text: String) = Intent(Intent.ACTION_SEND)
-        .setType("text/plain")
-        .putExtra(Intent.EXTRA_TEXT, text)
+    private fun getSendIntent(text: String) =
+        Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, text)
+            type = "text/plain"
+        }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
