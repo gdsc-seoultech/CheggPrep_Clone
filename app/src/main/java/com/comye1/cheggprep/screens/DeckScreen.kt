@@ -156,6 +156,9 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit, sh
                         },
                         bottomBar = {
                             DeckScreenBottomBar(onClick = {
+                                // Deck 추가하기
+                                // 리턴 값 -> 업데이트 판단
+                                if(viewModel.addDeckToMyList(key)) update()
                                 subNavController.navigate("practice")
                             })
                         }
@@ -251,7 +254,6 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit, sh
                             onDone = {
                                 // 뷰모델 함수 호출
                                 // popBackStack
-                                // 리턴 값 -> 업데이트 판단
                                 viewModel.updateCardList()
                                 subNavController.popBackStack()
                             }

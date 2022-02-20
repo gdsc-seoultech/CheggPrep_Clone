@@ -231,4 +231,27 @@ class DeckViewModel : ViewModel() {
         }
         return false
     }
+
+    // When user practices this Deck
+    fun addDeckToMyList(key: String): Boolean{
+        val database = Firebase.database.reference
+        val user = FirebaseAuth.getInstance().currentUser!!
+
+        return if (!user.isAnonymous) {
+            deck.value = deck.value?.copy(deckType = DECK_ADDED)
+            deck.value?.also {
+                if (it.deckType != DECK_ADDED) {
+                    val deckForUser = DeckForUser(deckType = it.deckType) //convert type to DECK_ADDED
+                    database.child("user/${user.uid}/decks/$key")
+                        .setValue(deckForUser)
+                        .addOnSuccessListener {
+                            Log.d("firebase added", deck.toString())
+                        }
+                    return true
+                }
+
+            }
+            false
+        }else false
+    }
 }
