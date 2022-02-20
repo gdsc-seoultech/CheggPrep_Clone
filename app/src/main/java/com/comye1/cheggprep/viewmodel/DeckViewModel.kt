@@ -166,7 +166,6 @@ class DeckViewModel : ViewModel() {
                     .addOnSuccessListener {
                         Log.d("firebase bookmarked", deck.toString())
                     }
-
             }
         }
     }
@@ -182,7 +181,7 @@ class DeckViewModel : ViewModel() {
                     // deck 속성을 변경하지 말고 새로운 deck를 인가해줘야 한다!
                     database.child("user/${user.uid}/decks/$key")
                         .setValue(
-                            deck
+                            DeckForUser(DECK_ADDED, false)
                         ).addOnSuccessListener {
                             Log.d("firebase bookmarked", deck.toString())
                         }
@@ -233,25 +232,33 @@ class DeckViewModel : ViewModel() {
     }
 
     // When user practices this Deck
-    fun addDeckToMyList(key: String): Boolean{
+    fun addDeckToMyList(key: String, update: () -> Unit) {
         val database = Firebase.database.reference
         val user = FirebaseAuth.getInstance().currentUser!!
 
-        return if (!user.isAnonymous) {
-            deck.value = deck.value?.copy(deckType = DECK_ADDED)
-            deck.value?.also {
-                if (it.deckType != DECK_ADDED) {
-                    val deckForUser = DeckForUser(deckType = it.deckType) //convert type to DECK_ADDED
-                    database.child("user/${user.uid}/decks/$key")
-                        .setValue(deckForUser)
-                        .addOnSuccessListener {
-                            Log.d("firebase added", deck.toString())
-                        }
-                    return true
-                }
+        if (!user.isAnonymous) {
 
+            Log.d("firebase added", "user")
+            deck.value?.also {
+                Log.d("firebase", "also")
+                when (it.deckType) {
+                    // 사용자 Deck가 아님 or 북마크만 되어 있음
+                    -1, DECK_ONLY_BOOKMARKED -> {
+                        Log.d("firebase", "when")
+                        deck.value!!.deckType = DECK_ADDED
+                        val deckForUser = DeckForUser(
+                            deckType = DECK_ADDED,
+                            bookmarked = it.bookmarked
+                        ) //convert type to DECK_ADDED
+                        database.child("user/${user.uid}/decks/$key")
+                            .setValue(deckForUser)
+                            .addOnSuccessListener {
+                                Log.d("firebase added", deck.toString())
+                                update()
+                            }
+                    }
+                }
             }
-            false
-        }else false
+        }
     }
 }

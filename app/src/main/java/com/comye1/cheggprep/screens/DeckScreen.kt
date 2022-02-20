@@ -43,7 +43,12 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 @ExperimentalComposeUiApi
 @ExperimentalPagerApi
 @Composable
-fun DeckScreen(navController: NavController, key: String, update: () -> Unit, shareDeck: (String) -> Unit) {
+fun DeckScreen(
+    navController: NavController,
+    key: String,
+    update: () -> Unit,
+    shareDeck: (String) -> Unit
+) {
 
     val viewModel: DeckViewModel = viewModel()
 
@@ -97,8 +102,8 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit, sh
                                             contentDescription = "share"
                                         )
                                     }
-                                    when (viewModel.deck.value!!.deckType) {
-                                        DECK_CREATED -> {
+                                    when {
+                                        viewModel.deck.value!!.deckType == DECK_CREATED -> {
                                             IconButton(onClick = { setUserMenuExpanded(true) }) {
                                                 Icon(
                                                     imageVector = Icons.Default.MoreVert,
@@ -122,7 +127,7 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit, sh
                                                 }
                                             )
                                         }
-                                        DECK_ONLY_BOOKMARKED -> {
+                                        viewModel.deck.value!!.bookmarked -> {
                                             IconButton(
                                                 onClick = {
                                                     viewModel.deleteBookmark(key = viewModel.deck.value!!.key)
@@ -155,12 +160,12 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit, sh
                             )
                         },
                         bottomBar = {
-                            DeckScreenBottomBar(onClick = {
+                            DeckScreenBottomBar {
                                 // Deck 추가하기
-                                // 리턴 값 -> 업데이트 판단
-                                if(viewModel.addDeckToMyList(key)) update()
+                                // 업데이트 판단
+                                viewModel.addDeckToMyList(key) { update() }
                                 subNavController.navigate("practice")
-                            })
+                            }
                         }
                     ) {
                         Column(
@@ -290,7 +295,7 @@ fun DeckScreen(navController: NavController, key: String, update: () -> Unit, sh
                     }
                 }
                 composable("practice") {
-                    PracticeScreen(cardList = viewModel.deck.value!!.cardList){
+                    PracticeScreen(cardList = viewModel.deck.value!!.cardList) {
                         subNavController.popBackStack()
                     }
                 }
@@ -550,7 +555,7 @@ private fun Deck.toText(): String {
         str += it.toString() + if (it > 1) " cards" else " card"
     }
     this.cardList.forEachIndexed { idx, card ->
-        str += "\n\n▶ ${idx+1}. ${card.front} \n${card.back}"
+        str += "\n\n▶ ${idx + 1}. ${card.front} \n${card.back}"
     }
     return str
 }
