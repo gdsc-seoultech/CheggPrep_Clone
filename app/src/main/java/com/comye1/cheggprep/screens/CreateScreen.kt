@@ -132,10 +132,12 @@ fun CreateCardScreen(
     }
 
     if (startIndex > 0) { // 특정 카드 수정 (0보다 큰 인덱스)
+        Log.d("create", "specific card, start index == ${startIndex}")
         LaunchedEffect(key1 = true) {
             pagerState.animateScrollToPage(startIndex)
         }
     } else if (startIndex == -1) { // 카드 추가
+        Log.d("create", "new card, start index == ${startIndex}")
         LaunchedEffect(key1 = true) {
             addCard()
             scrollToEnd++ // 맨 뒤로 스크롤
@@ -144,11 +146,15 @@ fun CreateCardScreen(
 
     // 카드 추가 시 맨 뒤로 스크롤
     LaunchedEffect(scrollToEnd) {
-        pagerState.animateScrollToPage(pagerState.pageCount - 1, pagerState.currentPageOffset)
+        Log.d("create", "scrollToEnd == ${scrollToEnd}")
+        if (scrollToEnd > 0){
+            pagerState.animateScrollToPage(pagerState.pageCount - 1, pagerState.currentPageOffset)
+        }
     }
     // 카드 삭제 시 하나 앞으로 스크롤
     LaunchedEffect(scrollForward) {
-        if (pagerState.currentPage > 0) {
+        Log.d("create", "scrollForward == ${scrollForward}")
+        if (scrollForward > 0 && pagerState.currentPage > 0) {
             pagerState.animateScrollToPage(pagerState.currentPage - 1)
         }
     }
