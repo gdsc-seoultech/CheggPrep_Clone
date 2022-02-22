@@ -3,9 +3,7 @@ package com.comye1.cheggprep.viewmodel
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
-import com.comye1.cheggprep.models.Card
-import com.comye1.cheggprep.models.DECK_CREATED
-import com.comye1.cheggprep.models.Deck
+import com.comye1.cheggprep.models.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
@@ -62,6 +60,11 @@ class HomeViewModel : ViewModel() {
                                         )
                                     )
                                     Log.d("myDeckList", myDeckList.size.toString())
+                                }
+                            }else {
+                                // Owner가 삭제한 Deck -> 삭제해줘야 한다.
+                                database.child("user/${user!!.uid}/decks/$key").removeValue().addOnSuccessListener {
+                                    Log.d("myDeckList remove", key)
                                 }
                             }
                         }
