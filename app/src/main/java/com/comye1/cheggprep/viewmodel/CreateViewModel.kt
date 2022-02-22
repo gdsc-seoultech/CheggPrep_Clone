@@ -19,7 +19,7 @@ class CreateViewModel : ViewModel() {
         val database = Firebase.database.reference
         val user = FirebaseAuth.getInstance().currentUser
 
-        user?.let {
+        user?.also {
             val key = database.child("all/decks").push().key ?: ""
             val deckForAll =
                 DeckForAll(
