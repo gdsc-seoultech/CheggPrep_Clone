@@ -197,38 +197,34 @@ class DeckViewModel : ViewModel() {
         }
     }
 
-    fun updateDeckDetail(title: String, shared: Boolean): Boolean {
+    fun updateDeckDetail(title: String, shared: Boolean, update: () -> Unit){
 
         val database = Firebase.database.reference
 
-        deck.value?.let {
-            return if (shared == it.shared && title == it.deckTitle) false
-            else {
+        deck.value?.also {
+            if (shared != it.shared || title != it.deckTitle){
                 database.child("all/decks/${it.key}").apply {
                     child("deckTitle").setValue(title)
                     child("shared").setValue(shared)
                 }
                 deck.value!!.deckTitle = title
                 deck.value!!.shared = shared
-                true
+                update()
             }
         }
-        return false
     }
 
-    fun updateCardList(): Boolean {
+    fun updateCardList(update: () -> Unit) {
 
         val database = Firebase.database.reference
 
-        deck.value?.let {
-            return if (edittingCardList == it.cardList) false
-            else {
+        deck.value?.also {
+            if (edittingCardList != it.cardList){
                 database.child("all/decks/${it.key}").child("cardList").setValue(edittingCardList)
                 deck.value!!.cardList = edittingCardList
-                true
+                update()
             }
         }
-        return false
     }
 
     // When user practices this Deck

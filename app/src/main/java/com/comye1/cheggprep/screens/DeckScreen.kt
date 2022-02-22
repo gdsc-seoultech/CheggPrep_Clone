@@ -32,7 +32,6 @@ import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.comye1.cheggprep.models.Card
 import com.comye1.cheggprep.models.DECK_CREATED
-import com.comye1.cheggprep.models.DECK_ONLY_BOOKMARKED
 import com.comye1.cheggprep.models.Deck
 import com.comye1.cheggprep.ui.theme.DeepOrange
 import com.comye1.cheggprep.ui.theme.Teal
@@ -221,12 +220,8 @@ fun DeckScreen(
                         }
                     ) { // onDone
 
-                        if (viewModel.updateDeckDetail(
-                                title = deckTitle,
-                                shared = visibility
-                            )
-                        ) {
-                            // 리턴 값이 true일 때 업데이트 필요
+                        viewModel.updateDeckDetail(title = deckTitle, shared = visibility)
+                        {   // 리턴 값이 true일 때 업데이트 필요
                             update()
                         }
                         subNavController.popBackStack()
@@ -259,7 +254,7 @@ fun DeckScreen(
                             onDone = {
                                 // 뷰모델 함수 호출
                                 // popBackStack
-                                viewModel.updateCardList()
+                                viewModel.updateCardList { update() }
                                 subNavController.popBackStack()
                             }
                         )
@@ -286,8 +281,7 @@ fun DeckScreen(
                             onDone = {
                                 // 뷰모델 함수 호출
                                 // popBackStack
-                                // 리턴 값 -> 업데이트 판단
-                                viewModel.updateCardList()
+                                viewModel.updateCardList { update() }
                                 subNavController.popBackStack()
                             }
                         )
