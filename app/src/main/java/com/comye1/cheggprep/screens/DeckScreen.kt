@@ -70,6 +70,7 @@ fun DeckScreen(
             DeletedDeckDialog {
                 viewModel.deleteBookmark(key) // 북마크에서 삭제
                 update() // HomeScreen 업데이트 필요
+                navController.popBackStack() // 이전 화면으로 돌아가기
             }
         }
         is DeckViewModel.DeckState.Valid -> {
@@ -399,7 +400,7 @@ fun UserDeckMenu(
  */
 @Composable
 fun DeletedDeckDialog(delete: () -> Unit) {
-    Dialog(onDismissRequest = { }) {
+    Dialog(onDismissRequest = { delete() }) {
         Column(
             Modifier
                 .fillMaxWidth()
