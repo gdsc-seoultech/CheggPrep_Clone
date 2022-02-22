@@ -28,6 +28,7 @@ import com.comye1.cheggprep.navigation.BottomNavigationBar
 import com.comye1.cheggprep.navigation.Screen
 import com.comye1.cheggprep.screens.*
 import com.comye1.cheggprep.ui.theme.CheggPrepTheme
+import com.comye1.cheggprep.utils.DotsTyping
 import com.comye1.cheggprep.viewmodel.CreateViewModel
 import com.comye1.cheggprep.viewmodel.HomeViewModel
 import com.comye1.cheggprep.viewmodel.MoreViewModel
@@ -38,6 +39,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 
 // TODO : BottomNavigationBar scale / popUpTo 옵션 지정
@@ -115,7 +117,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 val updateNeeded = remember {
-                    mutableStateOf(false)
+                    mutableStateOf(true)
                 }
 
                 Scaffold(
@@ -130,10 +132,15 @@ class MainActivity : ComponentActivity() {
                             showBottomBar(true)
                             if (updateNeeded.value) {
                                 homeViewModel.refresh()
-                                Log.d("home update", "called")
-                                updateNeeded.value = false
+                                Log.d("homerefresh", "called")
+                                DotsTyping()
+                                LaunchedEffect(key1 = true) {
+                                    delay(800L)
+                                    updateNeeded.value = false
+                                }
+                            }else {
+                                HomeScreen(navController, homeViewModel)
                             }
-                            HomeScreen(navController, homeViewModel)
                         }
                         composable(Screen.Search.route) {
                             showBottomBar(true)
