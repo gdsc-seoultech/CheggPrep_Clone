@@ -89,6 +89,11 @@ class MainActivity : ComponentActivity() {
                 }
 
                 val firebaseAuth = moreViewModel.firebaseAuth.collectAsState()
+
+                val updateNeeded = remember {
+                    mutableStateOf(false)
+                }
+
                 /*
                 event flow를 보내서 signIn / signOut을 전달받고
                 각 viewModel의 함수를 호출해서 새롭게 로드할 수 있을까?!
@@ -97,7 +102,7 @@ class MainActivity : ComponentActivity() {
                     moreViewModel.userEvent.collect { event ->
                         when (event) {
                             MoreViewModel.Companion.UserEvent.SignIn -> {
-                                homeViewModel.refresh()
+                                updateNeeded.value = true
                             }
                             MoreViewModel.Companion.UserEvent.SignOut -> {
                                 homeViewModel.clearDecks()
@@ -116,10 +121,6 @@ class MainActivity : ComponentActivity() {
                     mutableStateOf(true)
                 }
 
-                val updateNeeded = remember {
-                    mutableStateOf(true)
-                }
-
                 Scaffold(
                     bottomBar = {
                         if (bottomBarShown) {
@@ -131,10 +132,10 @@ class MainActivity : ComponentActivity() {
                         composable(Screen.Home.route) {
                             showBottomBar(true)
                             if (updateNeeded.value) {
-                                homeViewModel.refresh()
                                 Log.d("homerefresh", "called")
                                 DotsTyping()
                                 LaunchedEffect(key1 = true) {
+                                    homeViewModel.refresh()
                                     delay(800L)
                                     updateNeeded.value = false
                                 }
