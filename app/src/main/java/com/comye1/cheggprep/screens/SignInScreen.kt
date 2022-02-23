@@ -27,9 +27,7 @@ fun SignInScreen(viewModel: MoreViewModel) {
     var text by remember {
         mutableStateOf<String?>(null)
     }
-    val user by remember(viewModel) {
-        viewModel.user
-    }.collectAsState()
+
     val signInRequestCode = 1
     val authResultLauncher =
         rememberLauncherForActivityResult(contract = AuthResultContract()) { task ->
@@ -51,9 +49,8 @@ fun SignInScreen(viewModel: MoreViewModel) {
         authResultLauncher.launch(signInRequestCode)
         // authResultLauncer launch : SignIn Intent 실행 및 결과 처리 (AuthResultContract)
     })
-    user?.let {
+    viewModel.user.value?.also {
         viewModel.toMainScreen() // Flow를 통해 user가 전달되면 MainScreen으로 이동
-        // TODO 새로 로드하기,,, 어떢하죠
     }
 }
 

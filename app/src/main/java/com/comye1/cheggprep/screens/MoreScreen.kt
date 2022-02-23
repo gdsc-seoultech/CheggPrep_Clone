@@ -33,12 +33,7 @@ fun Modifier.moreModifier(onClick: () -> Unit) = this
 
 @ExperimentalMaterialApi
 @Composable
-fun MoreScreen(navController: NavHostController, viewModel: MoreViewModel) {
-
-    // 뷰모델에서 user 가져오기
-    val user = remember {
-        viewModel.user
-    }.collectAsState()
+fun MoreScreen(viewModel: MoreViewModel) {
 
     val context = LocalContext.current
 
@@ -72,9 +67,9 @@ fun MoreScreen(navController: NavHostController, viewModel: MoreViewModel) {
                 }
             ) {
                 Column {
-                    if (user.value != null) {
+                    if (viewModel.user.value != null) {
                         AccountSection(
-                            name = user.value!!.displayName,
+                            name = viewModel.user.value!!.displayName,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp),
                             signText = "Sign out",
                             signFunction = {

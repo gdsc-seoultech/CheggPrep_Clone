@@ -11,7 +11,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -88,8 +91,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                val firebaseAuth = moreViewModel.firebaseAuth.collectAsState()
-
                 val updateNeeded = remember {
                     mutableStateOf(false)
                 }
@@ -112,7 +113,7 @@ class MainActivity : ComponentActivity() {
                 }
 
 
-                if (firebaseAuth.value) { // firebaseAuth가 true일 때
+                if (moreViewModel.firebaseAuth.value) { // firebaseAuth가 true일 때
                     firebaseAuthWithGoogle(moreViewModel.token.value, moreViewModel::signIn)
                     moreViewModel.completeAuth() // 로그인 후 false로 변경
                 }
@@ -139,7 +140,7 @@ class MainActivity : ComponentActivity() {
                                     delay(800L)
                                     updateNeeded.value = false
                                 }
-                            }else {
+                            } else {
                                 HomeScreen(navController, homeViewModel)
                             }
                         }
@@ -155,7 +156,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Screen.More.route) {
                             showBottomBar(true)
-                            MoreScreen(navController, moreViewModel)
+                            MoreScreen(moreViewModel)
                         }
                         composable(
                             Screen.Deck.route + "/{key}",
