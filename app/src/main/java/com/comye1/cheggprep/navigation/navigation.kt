@@ -61,9 +61,7 @@ fun BottomNavigationBar(navController: NavController) {
                 enabled = item.route != currentRoute,
                 onClick = {
                     navController.navigate(item.route){
-                        popUpTo(currentRoute!!) {
-                            inclusive = true
-                        }
+                        popUpTo(Screen.Home.route)
                     }
                 },
                 icon = { Icon(imageVector = item.icon, contentDescription = item.name) },

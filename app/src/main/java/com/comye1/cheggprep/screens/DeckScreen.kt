@@ -28,8 +28,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.comye1.cheggprep.models.Card
 import com.comye1.cheggprep.models.DECK_CREATED
 import com.comye1.cheggprep.models.Deck
